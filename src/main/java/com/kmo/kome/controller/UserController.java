@@ -1,14 +1,16 @@
 package com.kmo.kome.controller;
 
+import com.kmo.kome.common.Result;
 import com.kmo.kome.dto.request.LoginRequest;
 import com.kmo.kome.dto.response.LoginResponse;
 import com.kmo.kome.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 用户登录、个人信息相关 API
+ * 用户控制器类。
+ * 负责处理与用户相关的请求，如登录、注册等操作。
+ * 使用了 @RestController 注解标识为控制器，并通过 @RequiredArgsConstructor 自动生成构造函数注入服务对象。
  */
 @RestController
 @RequiredArgsConstructor
@@ -17,13 +19,13 @@ public class UserController {
     private final UserService userService;
 
     /**
-     * Handles user login requests.
+     * 处理用户登录请求。
      *
-     * @param request the {@link LoginRequest} object containing the username and password for login
-     * @return a {@link ResponseEntity} containing the {@link LoginResponse}, which includes the authentication token and user information
+     * @param request 登录请求参数，包含用户名和密码信息。
+     * @return 登录结果，包含 JWT Token、过期时间及用户基本信息。
      */
     @PostMapping("/api/user/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
-        return ResponseEntity.ok(userService.login(request));
+    public Result<LoginResponse> login(@RequestBody LoginRequest request) {
+        return Result.success(userService.login(request));
     }
 }

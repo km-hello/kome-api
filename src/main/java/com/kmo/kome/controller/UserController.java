@@ -2,6 +2,7 @@ package com.kmo.kome.controller;
 
 import com.kmo.kome.common.Result;
 import com.kmo.kome.dto.request.LoginRequest;
+import com.kmo.kome.dto.request.UpdatePasswordRequest;
 import com.kmo.kome.dto.request.UpdateUserRequest;
 import com.kmo.kome.dto.response.LoginResponse;
 import com.kmo.kome.dto.response.UserInfoResponse;
@@ -47,5 +48,19 @@ public class UserController {
     @PutMapping("/api/admin/user")
     public Result<UserInfoResponse> updateUserInfoById(@AuthenticationPrincipal Long currentUserId, @Valid @RequestBody UpdateUserRequest updateUserRequest){
         return Result.success(userService.updateUserInfoById(currentUserId, updateUserRequest));
+    }
+
+    /**
+     * 更新指定用户的密码。
+     * 接收当前用户的 ID 和密码更新请求数据，调用服务层方法进行密码更新。
+     *
+     * @param currentUserId 当前登录用户的 ID，由认证框架自动解析。
+     * @param updatePasswordRequest 更新密码请求参数，包含旧密码和新密码信息。
+     * @return 一个空的 {@code Result<Void>} 对象，表示操作成功。
+     */
+    @PutMapping("/api/admin/user/password")
+    public Result<Void> updateUserPasswordById(@AuthenticationPrincipal Long currentUserId, @Valid @RequestBody UpdatePasswordRequest updatePasswordRequest){
+        userService.updateUserPasswordById(currentUserId, updatePasswordRequest);
+        return Result.success();
     }
 }

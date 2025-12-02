@@ -2,10 +2,12 @@ package com.kmo.kome.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.kmo.kome.dto.request.LoginRequest;
+import com.kmo.kome.dto.request.UpdatePasswordRequest;
 import com.kmo.kome.dto.request.UpdateUserRequest;
 import com.kmo.kome.dto.response.LoginResponse;
 import com.kmo.kome.dto.response.UserInfoResponse;
 import com.kmo.kome.entity.User;
+import jakarta.validation.Valid;
 
 /**
  * 用户业务接口
@@ -24,5 +26,7 @@ public interface UserService extends IService<User> {
 
     UserInfoResponse getUserInfoById(Long currentUserId);
 
-    UserInfoResponse updateUserInfoById(Long currentUserId, UpdateUserRequest updateUserRequest);
+    UserInfoResponse updateUserInfoById(Long currentUserId, @Valid UpdateUserRequest updateUserRequest);
+
+    void updateUserPasswordById(Long currentUserId, @Valid UpdatePasswordRequest updatePasswordRequest);
 }

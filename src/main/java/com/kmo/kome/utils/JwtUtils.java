@@ -41,15 +41,15 @@ public class JwtUtils {
     }
 
     /**
-     * 生成 JWT Token
+     * 生成 JWT Token。
      *
-     * @param username 用户名 (作为 Subject)
-     * @return 加密后的 Token 字符串
+     * @param userId 用户的唯一标识符，用于设置 Token 的主题 (Subject)
+     * @return 生成的 JWT Token 字符串
      */
-    public String generateToken(String username) {
+    public String generateToken(Long userId) {
         return Jwts.builder()
                 .header().add("typ", "JWT").and() // 可选: 添加 Header 标识
-                .subject(username) // 设置主题 (用户名)
+                .subject(String.valueOf(userId)) // 主题 (Subject) 设置为 userId 的字符串形式
                 .issuedAt(new Date()) // 设置签发时间
                 .expiration(new Date(System.currentTimeMillis() + expiration)) // 设置过期时间
                 .signWith(getSigningKey(), Jwts.SIG.HS256) // 使用 Jwts.SIG.HS256 指定算法签名
@@ -57,13 +57,14 @@ public class JwtUtils {
     }
 
     /**
-     * 从 Token 中解析用户名
+     * 从提供的 JWT Token 中解析并获取用户的唯一标识符 (userId)。
      *
-     * @param token JWT Token
-     * @return 用户名
+     * @param token JWT Token，用于解析和提取用户 ID
+     * @return 解析后的用户唯一标识符 (userId)，以 Long 类型返回
      */
-    public String getUsernameFromToken(String token) {
-        return parseToken(token).getPayload().getSubject();
+    public Long getUserIdFromToken(String token) {
+        String subject = parseToken(token).getPayload().getSubject();
+        return Long.parseLong(subject);
     }
 
     /**

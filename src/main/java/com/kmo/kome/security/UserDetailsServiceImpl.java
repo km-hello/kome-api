@@ -1,9 +1,8 @@
-package com.kmo.kome.service.impl;
+package com.kmo.kome.security;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.kmo.kome.entity.User;
 import com.kmo.kome.mapper.UserMapper;
-import com.kmo.kome.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -42,11 +41,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException("用户不存在");
         }
 
-        // 3. 转换为 UserDetails 对象
-        return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
-                user.getPassword(), // 数据库中的密文
-                Collections.emptyList() // 权限列表（暂为空）
-        );
+        // 3. 转换自定义的 CustomUserDetails 对象
+        return new CustomUserDetails(user);
     }
 }

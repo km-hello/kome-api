@@ -1,11 +1,11 @@
 package com.kmo.kome.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.kmo.kome.dto.request.LoginRequest;
 import com.kmo.kome.dto.response.LoginResponse;
 import com.kmo.kome.entity.User;
 import com.kmo.kome.mapper.UserMapper;
+import com.kmo.kome.security.CustomUserDetails;
 import com.kmo.kome.service.UserService;
 import com.kmo.kome.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
@@ -46,13 +46,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
         );
 
-        // 2. 认证通过后，从数据库获取完整用户信息
-        // authentication.getName() 获取到的是用户名
-        User user = this.getOne(new LambdaQueryWrapper<User>()
-                .eq(User::getUsername, authentication.getName()));
+        // 2. 【核心修改】直接从 Authentication 对象中获取用户信息，不再查询数据库
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        User user = userDetails.getUser();
 
-        // 3. 生成 JWT Token
-        String token = jwtUtils.generateToken(user.getUsername());
+        // 3. 【核心修改】使用 userId 生成 JWT Token
+        String token = jwtUtils.generateToken(user.getId());
 
         // 4. 组装并返回 Response
         return LoginResponse.builder()

@@ -3,6 +3,7 @@ package com.kmo.kome.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.kmo.kome.dto.request.LoginRequest;
 import com.kmo.kome.dto.response.LoginResponse;
+import com.kmo.kome.dto.response.UserInfoResponse;
 import com.kmo.kome.entity.User;
 
 /**
@@ -19,4 +20,6 @@ public interface UserService extends IService<User> {
      * @return 登录成功后的响应数据 (Token等)
      */
     LoginResponse login(LoginRequest request);
+
+    UserInfoResponse getUserInfoById(Long currentUserId);
 }

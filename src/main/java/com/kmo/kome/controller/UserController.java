@@ -3,8 +3,10 @@ package com.kmo.kome.controller;
 import com.kmo.kome.common.Result;
 import com.kmo.kome.dto.request.LoginRequest;
 import com.kmo.kome.dto.response.LoginResponse;
+import com.kmo.kome.dto.response.UserInfoResponse;
 import com.kmo.kome.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -27,5 +29,16 @@ public class UserController {
     @PostMapping("/api/user/login")
     public Result<LoginResponse> login(@RequestBody LoginRequest request) {
         return Result.success(userService.login(request));
+    }
+
+    /**
+     * 根据用户 ID 获取用户详细信息。
+     *
+     * @param currentUserId 当前登录用户的 ID，通过认证注解自动解析。
+     * @return 包含用户详细信息的响应结果，包括用户 ID、用户名、昵称、头像、邮箱和个人描述等。
+     */
+    @GetMapping("/api/admin/user")
+    public Result<UserInfoResponse> getUserInfoById(@AuthenticationPrincipal Long currentUserId){
+        return Result.success(userService.getUserInfoById(currentUserId));
     }
 }

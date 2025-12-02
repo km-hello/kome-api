@@ -1,8 +1,11 @@
 package com.kmo.kome.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.kmo.kome.common.ResultCode;
+import com.kmo.kome.common.exception.ServiceException;
 import com.kmo.kome.dto.request.LoginRequest;
 import com.kmo.kome.dto.response.LoginResponse;
+import com.kmo.kome.dto.response.UserInfoResponse;
 import com.kmo.kome.entity.User;
 import com.kmo.kome.mapper.UserMapper;
 import com.kmo.kome.security.CustomUserDetails;
@@ -60,6 +63,37 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 .nickname(user.getNickname())
                 .expiresIn(expiration)
                 .avatar(user.getAvatar())
+                .build();
+    }
+
+    /**
+     * 根据用户ID获取用户信息。
+     * 如果用户ID为空或对应的用户不存在，将抛出业务异常。
+     *
+     * @param currentUserId 当前用户的ID，不允许为空。
+     * @return 包含用户关键信息的响应对象 {@code UserInfoResponse}。
+     * @throws ServiceException 当用户ID为空时抛出未授权异常；当未找到对应用户信息时抛出未找到异常。
+     */
+    @Override
+    public UserInfoResponse getUserInfoById(Long currentUserId) {
+        if(currentUserId == null){
+            throw new ServiceException(ResultCode.UNAUTHORIZED.getCode(),"未登录");
+        }
+
+        User user = this.getById(currentUserId);
+
+        if(user == null){
+            throw new ServiceException(ResultCode.NOT_FOUND.getCode(), "未找到用户信息");
+        }
+
+        return UserInfoResponse
+                .builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .nickname(user.getNickname())
+                .avatar(user.getAvatar())
+                .email(user.getEmail())
+                .description(user.getDescription())
                 .build();
     }
 }

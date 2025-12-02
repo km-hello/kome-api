@@ -1,9 +1,11 @@
 package com.kmo.kome.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.kmo.kome.common.ResultCode;
 import com.kmo.kome.common.exception.ServiceException;
 import com.kmo.kome.dto.request.LoginRequest;
+import com.kmo.kome.dto.request.UpdateUserRequest;
 import com.kmo.kome.dto.response.LoginResponse;
 import com.kmo.kome.dto.response.UserInfoResponse;
 import com.kmo.kome.entity.User;
@@ -17,6 +19,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 /**
  * 用户业务实现类
@@ -88,6 +91,70 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         return UserInfoResponse
                 .builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .nickname(user.getNickname())
+                .avatar(user.getAvatar())
+                .email(user.getEmail())
+                .description(user.getDescription())
+                .build();
+    }
+
+    /**
+     * 更新指定用户的基本信息。
+     * 如果当前用户 ID 为空，抛出未登录异常。
+     * 如果用户不存在或更新的用户名已被占用，将抛出相应的业务异常。
+     *
+     * @param currentUserId 当前用户的 ID，不允许为空。
+     * @param updateUserRequest 包含更新数据的请求对象，可能包括用户名、昵称、头像、邮箱和描述等字段。
+     * @return 更新后的用户信息响应对象 {@code UserInfoResponse}。
+     * @throws ServiceException 当用户未登录、用户不存在或用户名已被占用时抛出相应的异常。
+     */
+    @Override
+    public UserInfoResponse updateUserInfoById(Long currentUserId, UpdateUserRequest updateUserRequest) {
+        // 前置检查
+        if(currentUserId == null){
+            throw new ServiceException(ResultCode.UNAUTHORIZED.getCode(),"未登录");
+        }
+
+        // 检查用户是否存在
+        User user = this.getById(currentUserId);
+        if(user == null){
+            throw new ServiceException(ResultCode.NOT_FOUND.getCode(), "用户不存在");
+        }
+
+        // 检查用户名是否被占用
+        String newUsername = updateUserRequest.getUsername();
+        if(StringUtils.hasText(newUsername) && !newUsername.equals(user.getUsername())){
+            QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("username", newUsername)
+                        .ne("id", currentUserId);
+            if(this.count(queryWrapper) > 0){
+                throw new ServiceException(ResultCode.FAILED.getCode(), "用户名已存在");
+            }
+            user.setUsername(newUsername);
+        }
+
+        // 设置其他需要更新的字段
+        if(updateUserRequest.getNickname() != null){
+            user.setNickname(updateUserRequest.getNickname());
+        }
+
+        if(updateUserRequest.getAvatar() != null){
+            user.setAvatar(updateUserRequest.getAvatar());
+        }
+
+        if(updateUserRequest.getEmail() != null){
+            user.setEmail(updateUserRequest.getEmail());
+        }
+
+        if(updateUserRequest.getDescription() != null){
+            user.setDescription(updateUserRequest.getDescription());
+        }
+
+        this.updateById(user);
+
+        return UserInfoResponse.builder()
                 .id(user.getId())
                 .username(user.getUsername())
                 .nickname(user.getNickname())

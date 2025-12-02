@@ -2,9 +2,11 @@ package com.kmo.kome.controller;
 
 import com.kmo.kome.common.Result;
 import com.kmo.kome.dto.request.LoginRequest;
+import com.kmo.kome.dto.request.UpdateUserRequest;
 import com.kmo.kome.dto.response.LoginResponse;
 import com.kmo.kome.dto.response.UserInfoResponse;
 import com.kmo.kome.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -40,5 +42,10 @@ public class UserController {
     @GetMapping("/api/admin/user")
     public Result<UserInfoResponse> getUserInfoById(@AuthenticationPrincipal Long currentUserId){
         return Result.success(userService.getUserInfoById(currentUserId));
+    }
+
+    @PutMapping("/api/admin/user")
+    public Result<UserInfoResponse> updateUserInfoById(@AuthenticationPrincipal Long currentUserId, @Valid @RequestBody UpdateUserRequest updateUserRequest){
+        return Result.success(userService.updateUserInfoById(currentUserId, updateUserRequest));
     }
 }

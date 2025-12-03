@@ -5,13 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 /**
- * 一个通用的结果对象，用于封装接口调用的响应信息。
- * 提供了状态码、提示信息、返回数据和时间戳等字段。
- * 支持构建成功和错误结果的静态方法。
+ * 表示接口返回结果的通用类，封装了状态码、提示信息、数据信息以及时间戳。
+ * 支持通过静态方法快捷创建成功或失败的结果实例。
  *
- * @param <T> 泛型参数，表示返回数据的类型。
+ * @param <T> 返回数据的类型。
  */
 @Data
 @Builder
@@ -59,65 +57,33 @@ public class Result<T> {
                 .build();
     }
 
-
     /**
-     * 创建一个包含自定义成功消息和数据的结果实例。
+     * 创建一个包含指定错误代码的结果实例。
      *
      * @param <T> 数据的类型。
-     * @param message 成功消息，描述操作结果。
-     * @param data 要包含在结果中的数据。
-     * @return 一个 {@code Result} 实例，表示操作成功，包含状态码 200、自定义消息和指定数据。
+     * @param resultCode 错误代码对象，包含错误状态码和默认错误消息。
+     * @return 一个 {@code Result} 实例，表示操作失败，包含指定的错误状态码和默认的错误消息。
      */
-    public static <T> Result<T> success(String message, T data) {
+    public static <T> Result<T> fail(ResultCode resultCode) {
         return Result
                 .<T>builder()
-                .code(ResultCode.SUCCESS.getCode())
-                .message(message)
-                .data(data)
+                .code(resultCode.getCode())
+                .message(resultCode.getMessage())
                 .build();
     }
 
     /**
-     * 创建一个通用的错误结果实例。
+     * 创建一个包含指定错误代码和错误消息的结果实例。
      *
      * @param <T> 数据的类型。
-     * @return 一个 {@code Result} 实例，表示操作失败，包含状态码 500 和默认的失败消息。
+     * @param resultCode 错误代码对象，包含错误状态码和默认错误消息。
+     * @param message 自定义的错误消息，用于覆盖默认的错误描述。
+     * @return 一个 {@code Result} 实例，表示操作失败，包含指定的状态码和自定义的错误消息。
      */
-    public static <T> Result<T> fail() {
+    public static <T> Result<T> fail(ResultCode resultCode, String message) {
         return Result
                 .<T>builder()
-                .code(ResultCode.FAILED.getCode())
-                .message(ResultCode.FAILED.getMessage())
-                .build();
-    }
-
-    /**
-     * 创建一个包含错误消息的结果实例。
-     *
-     * @param <T> 数据的类型。
-     * @param message 错误消息，用于描述操作失败的原因。
-     * @return 一个 {@code Result} 实例，标识操作失败，包含状态码 500 和指定的错误消息。
-     */
-    public static <T> Result<T> fail(String message) {
-        return Result
-                .<T>builder()
-                .code(ResultCode.FAILED.getCode())
-                .message(message)
-                .build();
-    }
-
-    /**
-     * 创建一个包含自定义错误码和错误消息的结果实例。
-     *
-     * @param <T> 数据的类型。
-     * @param code 错误码，用于标识错误类型。
-     * @param message 错误消息，用于描述操作失败的原因。
-     * @return 一个 {@code Result} 实例，表示操作失败，包含指定的错误码和错误消息。
-     */
-    public static <T> Result<T> fail(Integer code, String message) {
-        return Result
-                .<T>builder()
-                .code(code)
+                .code(resultCode.getCode())
                 .message(message)
                 .build();
     }

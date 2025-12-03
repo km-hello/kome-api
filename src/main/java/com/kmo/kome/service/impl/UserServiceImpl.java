@@ -84,15 +84,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     @Override
     public UserInfoResponse getUserInfoById(Long currentUserId) {
-        if(currentUserId == null){
-            throw new ServiceException(ResultCode.UNAUTHORIZED.getCode(),"未登录");
-        }
-
-        User user = this.getById(currentUserId);
-
-        if(user == null){
-            throw new ServiceException(ResultCode.NOT_FOUND.getCode(), "未找到用户信息");
-        }
+        // 前置检查
+        User user = checkAndGetUser(currentUserId);
 
         return UserInfoResponse
                 .builder()
@@ -118,15 +111,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public UserInfoResponse updateUserInfoById(Long currentUserId, UpdateUserRequest updateUserRequest) {
         // 前置检查
-        if(currentUserId == null){
-            throw new ServiceException(ResultCode.UNAUTHORIZED.getCode(),"未登录");
-        }
-
-        // 检查用户是否存在
-        User user = this.getById(currentUserId);
-        if(user == null){
-            throw new ServiceException(ResultCode.NOT_FOUND.getCode(), "用户不存在");
-        }
+        User user = checkAndGetUser(currentUserId);
 
         // 检查用户名是否被占用
         String newUsername = updateUserRequest.getUsername();
@@ -135,7 +120,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             queryWrapper.eq("username", newUsername)
                         .ne("id", currentUserId);
             if(this.count(queryWrapper) > 0){
-                throw new ServiceException(ResultCode.FAILED.getCode(), "用户名已存在");
+                throw new ServiceException(ResultCode.BAD_REQUEST, "用户名已存在");
             }
             user.setUsername(newUsername);
         }
@@ -180,17 +165,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     @Override
     public void updateUserPasswordById(Long currentUserId, UpdatePasswordRequest updatePasswordRequest) {
-        // 1. 获取当前用户
-        User user = Optional.ofNullable(this.getById(currentUserId))
-                .orElseThrow(() -> new ServiceException(ResultCode.NOT_FOUND.getCode(), "用户状态异常"));
+        // 前置检查
+        User user = checkAndGetUser(currentUserId);
         // 2. 验证旧密码是否正确
         if(!passwordEncoder.matches(updatePasswordRequest.getOldPassword(), user.getPassword())){
-            throw new ServiceException(ResultCode.FAILED.getCode(),"旧密码错误");
+            throw new ServiceException(ResultCode.BAD_REQUEST,"旧密码错误");
         }
 
         // 3. 检查新旧密码是否相同
         if(updatePasswordRequest.getNewPassword().equals(updatePasswordRequest.getOldPassword())){
-            throw new ServiceException(ResultCode.FAILED.getCode(), "新密码不能与旧密码相同");
+            throw new ServiceException(ResultCode.BAD_REQUEST, "新密码不能与旧密码相同");
         }
 
         // 4. 新密码加密
@@ -199,5 +183,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 5. 更新用户的新密码
         user.setPassword(encodePassword);
         this.updateById(user);
+    }
+
+    private User checkAndGetUser(Long currentUserId) {
+        // 前置检查
+        if(currentUserId == null){
+            throw new ServiceException(ResultCode.UNAUTHORIZED);
+        }
+
+        // 检查用户是否存在
+        User user = this.getById(currentUserId);
+        if(user == null){
+            throw new ServiceException(ResultCode.NOT_FOUND);
+        }
+        return user;
     }
 }

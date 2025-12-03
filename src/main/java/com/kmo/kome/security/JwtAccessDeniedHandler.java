@@ -38,7 +38,7 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
 
-        Result<Object> result = Result.fail(ResultCode.FORBIDDEN.getCode(), "权限不足：您无权访问该资源");
+        Result<Object> result = Result.fail(ResultCode.FORBIDDEN);
 
         response.getWriter().write(new ObjectMapper().writeValueAsString(result));
     }

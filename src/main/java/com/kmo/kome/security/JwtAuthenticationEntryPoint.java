@@ -37,7 +37,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
 
         // 构建 Result 对象
-        Result<Object> result = Result.fail(ResultCode.UNAUTHORIZED.getCode(), "认证失败：请登录或Token已过期");
+        Result<Object> result = Result.fail(ResultCode.UNAUTHORIZED);
 
         // 手动转 JSON 并写入响应
         response.getWriter().write(new ObjectMapper().writeValueAsString(result));

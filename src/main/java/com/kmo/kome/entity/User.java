@@ -30,11 +30,6 @@ public class User {
     @TableLogic
     private Integer isDeleted;
 
-    // 插入时自动填充时间
-    @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
-
-    // 插入和更新时自动填充时间
-    @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
 }

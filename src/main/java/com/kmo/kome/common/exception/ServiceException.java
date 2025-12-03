@@ -2,6 +2,7 @@ package com.kmo.kome.common.exception;
 
 import com.kmo.kome.common.ResultCode;
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 /**
  * 自定义服务异常类，用于封装业务逻辑中的异常信息。
@@ -11,38 +12,40 @@ import lombok.Getter;
 @Getter
 public class ServiceException extends RuntimeException{
     private final Integer code;
-
-    /**
-     * 创建一个带有自定义错误消息的服务异常。
-     * 当业务逻辑中出现需要明确的错误提示时，可以通过该构造方法抛出异常。
-     *
-     * @param message 异常信息，用于描述具体的错误或异常原因。
-     */
-    public ServiceException(String message) {
-        super(message);
-        this.code = ResultCode.FAILED.getCode();
-    }
+    private final ResultCode resultCode;
 
     /**
      * 使用指定的结果代码创建服务异常。
-     * 构造方法将结果代码中的错误消息和错误码赋值到异常的相应属性中。
+     * 该构造方法通过传入的结果代码枚举初始化异常的错误消息和错误码。
      *
-     * @param resultCode 结果代码枚举，包含错误码和错误消息，用于描述异常原因。
+     * @param resultCode 结果代码枚举，包含错误码、错误消息及对应的 HTTP 状态码。
      */
     public ServiceException(ResultCode resultCode) {
         super(resultCode.getMessage());
         this.code = resultCode.getCode();
+        this.resultCode = resultCode;
     }
 
     /**
-     * 使用自定义的错误码和错误信息创建服务异常。
-     * 该构造方法适用于需要同时指定错误码和错误信息的场景。
+     * 使用指定的结果代码和自定义错误消息创建服务异常。
+     * 该构造方法允许传入自定义的错误描述，但错误码仍然从结果代码枚举中获取。
      *
-     * @param code 错误码，用于标识具体的错误类型。
-     * @param message 异常信息，用于描述具体的错误或异常原因。
+     * @param resultCode 结果代码枚举，包含错误码和默认错误消息。
+     * @param message 自定义的错误消息，可用于覆盖结果代码中的默认错误消息。
      */
-    public ServiceException(Integer code, String message) {
+    public ServiceException(ResultCode resultCode, String message) {
         super(message);
-        this.code = code;
+        this.code = resultCode.getCode();
+        this.resultCode = resultCode;
+    }
+
+    /**
+     * 获取与当前服务异常相关联的 HTTP 状态码。
+     * 该方法从异常的结果代码中提取对应的 HTTP 状态码，用于统一封装和响应业务操作的 HTTP 状态。
+     *
+     * @return HTTP 状态码，表示异常对应的标准 HTTP 状态信息。
+     */
+    public HttpStatus getHttpStatus(){
+        return resultCode.getHttpStatus();
     }
 }

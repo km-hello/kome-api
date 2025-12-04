@@ -10,7 +10,7 @@ import lombok.Data;
  * 旧密码不能为空，新密码需满足长度要求（6到24位）。
  */
 @Data
-public class UpdatePasswordRequest {
+public class UserUpdatePasswordRequest {
     @NotBlank(message = "旧密码不能为空")
     private String oldPassword;
     @NotBlank(message = "新密码不能为空")

@@ -1,10 +1,10 @@
 package com.kmo.kome.controller;
 
 import com.kmo.kome.common.Result;
-import com.kmo.kome.dto.request.LoginRequest;
-import com.kmo.kome.dto.request.UpdatePasswordRequest;
-import com.kmo.kome.dto.request.UpdateUserRequest;
-import com.kmo.kome.dto.response.LoginResponse;
+import com.kmo.kome.dto.request.UserLoginRequest;
+import com.kmo.kome.dto.request.UserUpdatePasswordRequest;
+import com.kmo.kome.dto.request.UserUpdateRequest;
+import com.kmo.kome.dto.response.UserLoginResponse;
 import com.kmo.kome.dto.response.UserInfoResponse;
 import com.kmo.kome.service.UserService;
 import jakarta.validation.Valid;
@@ -30,7 +30,7 @@ public class UserController {
      * @return 登录结果，包含 JWT Token、过期时间及用户基本信息。
      */
     @PostMapping("/api/user/login")
-    public Result<LoginResponse> login(@RequestBody LoginRequest request) {
+    public Result<UserLoginResponse> login(@RequestBody UserLoginRequest request) {
         return Result.success(userService.login(request));
     }
 
@@ -46,8 +46,8 @@ public class UserController {
     }
 
     @PutMapping("/api/admin/user")
-    public Result<UserInfoResponse> updateUserInfoById(@AuthenticationPrincipal Long currentUserId, @Valid @RequestBody UpdateUserRequest updateUserRequest){
-        return Result.success(userService.updateUserInfoById(currentUserId, updateUserRequest));
+    public Result<UserInfoResponse> updateUserInfoById(@AuthenticationPrincipal Long currentUserId, @Valid @RequestBody UserUpdateRequest request){
+        return Result.success(userService.updateUserInfoById(currentUserId, request));
     }
 
     /**
@@ -55,12 +55,12 @@ public class UserController {
      * 接收当前用户的 ID 和密码更新请求数据，调用服务层方法进行密码更新。
      *
      * @param currentUserId 当前登录用户的 ID，由认证框架自动解析。
-     * @param updatePasswordRequest 更新密码请求参数，包含旧密码和新密码信息。
+     * @param request 更新密码请求参数，包含旧密码和新密码信息。
      * @return 一个空的 {@code Result<Void>} 对象，表示操作成功。
      */
     @PutMapping("/api/admin/user/password")
-    public Result<Void> updateUserPasswordById(@AuthenticationPrincipal Long currentUserId, @Valid @RequestBody UpdatePasswordRequest updatePasswordRequest){
-        userService.updateUserPasswordById(currentUserId, updatePasswordRequest);
+    public Result<Void> updateUserPasswordById(@AuthenticationPrincipal Long currentUserId, @Valid @RequestBody UserUpdatePasswordRequest request){
+        userService.updateUserPasswordById(currentUserId, request);
         return Result.success();
     }
 }

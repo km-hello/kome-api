@@ -8,7 +8,7 @@ import lombok.Data;
  * 主要应用于用户信息更新业务逻辑中。
  */
 @Data
-public class UpdateUserRequest {
+public class UserUpdateRequest {
     private String username;
     private String nickname;
     private String avatar;

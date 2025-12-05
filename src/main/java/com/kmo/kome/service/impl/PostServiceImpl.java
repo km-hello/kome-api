@@ -7,10 +7,12 @@ import com.kmo.kome.common.exception.ServiceException;
 import com.kmo.kome.dto.request.PostCreateRequest;
 import com.kmo.kome.dto.request.PostUpdateRequest;
 import com.kmo.kome.dto.response.PostDetailResponse;
+import com.kmo.kome.dto.response.TagResponse;
 import com.kmo.kome.entity.Post;
 import com.kmo.kome.entity.PostTag;
 import com.kmo.kome.mapper.PostMapper;
 import com.kmo.kome.mapper.PostTagMapper;
+import com.kmo.kome.mapper.TagMapper;
 import com.kmo.kome.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -28,6 +30,7 @@ import java.util.stream.Collectors;
 public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements PostService {
 
     private final PostTagMapper postTagMapper;
+    private final TagMapper tagMapper;
 
     @Override
     @Transactional
@@ -130,14 +133,16 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
      */
     @Override
     public PostDetailResponse getPostById(Long id) {
+        // 根据 id 查询文章
         Post post = this.getById(id);
         if(post == null){
             throw new ServiceException(ResultCode.NOT_FOUND);
         }
 
-        PostDetailResponse response = new PostDetailResponse();
-        BeanUtils.copyProperties(post, response);
-        return response;
+        // 后台接口不增加阅读量
+
+        // 组装并返回 DTO
+        return buildPostDetailResponse(post);
     }
 
     /**
@@ -159,10 +164,31 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
             throw new ServiceException(ResultCode.NOT_FOUND, "文章不存在或未发布");
         }
 
+        // TODO 增加阅读量逻辑
+
+        return buildPostDetailResponse(post);
+    }
+
+    /**
+     * 构建文章详情响应对象。
+     * 根据给定的文章实体对象，复制其基本属性，查询并设置相关联的标签信息，
+     * 最终返回封装完成的文章详情响应对象。
+     *
+     * @param post 文章实体对象，用于提供文章的基本信息和唯一标识符。
+     * @return 包含文章详细信息和关联标签列表的响应对象。
+     */
+    private PostDetailResponse buildPostDetailResponse(Post post){
+        // 复制文章基本属性
         PostDetailResponse response = new PostDetailResponse();
         BeanUtils.copyProperties(post, response);
+
+        // 查询并设置标签列表
+        List<TagResponse> tags = tagMapper.findTagsByPostId(post.getId());
+        response.setTags(tags);
+
         return response;
     }
+
 
     /**
      * 检查文章的别名（Slug）是否唯一。

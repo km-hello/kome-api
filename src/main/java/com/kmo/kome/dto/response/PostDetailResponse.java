@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 文章详情响应 DTO 类。
@@ -31,4 +32,6 @@ public class PostDetailResponse {
 
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
+
+    private List<TagResponse> tags;
 }

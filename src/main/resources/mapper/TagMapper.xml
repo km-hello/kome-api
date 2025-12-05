@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 命名空间(namespace)必须是你的Mapper接口的全限定名 -->
+<mapper namespace="com.kmo.kome.mapper.TagMapper">
+
+    <!--
+        功能: 根据单个文章ID查询其所有标签
+        用于: 文章详情页
+        id: 必须与TagMapper.java中的方法名一致
+        resultType: 返回的单个对象的类型
+    -->
+    <select id="findTagsByPostId" resultType="com.kmo.kome.dto.response.TagResponse">
+        SELECT
+            t.id,
+            t.name
+        FROM
+            tag t
+        JOIN
+            post_tag pt ON t.id = pt.tag_id
+        WHERE
+            pt.post_id = #{postId}
+        ORDER BY
+            t.id asc
+    </select>
+
+</mapper>

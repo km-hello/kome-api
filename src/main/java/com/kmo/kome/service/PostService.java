@@ -3,6 +3,7 @@ package com.kmo.kome.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.kmo.kome.dto.request.PostCreateRequest;
 import com.kmo.kome.dto.request.PostUpdateRequest;
+import com.kmo.kome.dto.response.PostDetailResponse;
 import com.kmo.kome.entity.Post;
 import jakarta.validation.Valid;
 
@@ -18,4 +19,7 @@ public interface PostService extends IService<Post> {
     Void deletePostById(Long id);
 
     Void updatePostById(Long id, @Valid PostUpdateRequest request);
+
+    PostDetailResponse getPostById(Long id);
 }
+

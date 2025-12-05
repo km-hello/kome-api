@@ -3,6 +3,7 @@ package com.kmo.kome.controller;
 import com.kmo.kome.common.Result;
 import com.kmo.kome.dto.request.PostCreateRequest;
 import com.kmo.kome.dto.request.PostUpdateRequest;
+import com.kmo.kome.dto.response.PostDetailResponse;
 import com.kmo.kome.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -49,5 +50,17 @@ public class PostController {
     @PutMapping("/api/admin/posts/{id}")
     public Result<Void> updatePostById(@PathVariable Long id, @Valid @RequestBody PostUpdateRequest request){
         return Result.success(postService.updatePostById(id, request));
+    }
+
+    /**
+     * 根据文章 ID 获取文章详情。
+     * 调用服务层方法查询指定 ID 的文章信息，并返回文章的详细数据。
+     *
+     * @param id 要查询的文章 ID。
+     * @return 包含文章详细信息的结果对象 {@code Result<PostDetailResponse>}。
+     */
+    @GetMapping("/api/admin/posts/{id}")
+    public Result<PostDetailResponse> getPostById(@PathVariable Long id){
+        return Result.success(postService.getPostById(id));
     }
 }

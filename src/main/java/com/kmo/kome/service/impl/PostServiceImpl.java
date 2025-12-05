@@ -6,6 +6,7 @@ import com.kmo.kome.common.ResultCode;
 import com.kmo.kome.common.exception.ServiceException;
 import com.kmo.kome.dto.request.PostCreateRequest;
 import com.kmo.kome.dto.request.PostUpdateRequest;
+import com.kmo.kome.dto.response.PostDetailResponse;
 import com.kmo.kome.entity.Post;
 import com.kmo.kome.entity.PostTag;
 import com.kmo.kome.mapper.PostMapper;
@@ -117,6 +118,26 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
         updatePostTags(id, request.getTagIds());
 
         return null;
+    }
+
+    /**
+     * 根据文章 ID 获取文章详情。
+     * 如果指定的文章不存在，则抛出业务异常。
+     *
+     * @param id 文章的唯一标识符，不允许为空。
+     * @return 包含文章详细信息的响应对象。
+     * @throws ServiceException 如果文章不存在，则抛出包含 404 状态的业务异常。
+     */
+    @Override
+    public PostDetailResponse getPostById(Long id) {
+        Post post = this.getById(id);
+        if(post == null){
+            throw new ServiceException(ResultCode.NOT_FOUND);
+        }
+
+        PostDetailResponse response = new PostDetailResponse();
+        BeanUtils.copyProperties(post, response);
+        return response;
     }
 
     /**

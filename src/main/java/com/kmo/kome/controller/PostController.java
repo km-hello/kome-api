@@ -2,6 +2,7 @@ package com.kmo.kome.controller;
 
 import com.kmo.kome.common.Result;
 import com.kmo.kome.dto.request.PostCreateRequest;
+import com.kmo.kome.dto.request.PostUpdateRequest;
 import com.kmo.kome.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +34,20 @@ public class PostController {
      * @return 一个空的 {@code Result<Void>} 对象，表示删除操作的结果。
      */
     @DeleteMapping("/api/admin/posts/{id}")
-    public Result<Void> deletePost(@PathVariable Long id){
+    public Result<Void> deletePostById(@PathVariable Long id){
         return Result.success(postService.deletePostById(id));
+    }
+
+    /**
+     * 根据文章 ID 更新文章信息。
+     * 接收文章更新请求对象，调用服务层方法根据文章 ID 更新对应的文章数据。
+     *
+     * @param id 要更新的文章 ID。
+     * @param request 文章更新请求参数，包含文章的标题、摘要、内容、封面图片、置顶状态、文章状态及标签列表等内容。
+     * @return 一个空的 {@code Result<Void>} 对象，表示更新操作的结果。
+     */
+    @PutMapping("/api/admin/posts/{id}")
+    public Result<Void> updatePostById(@PathVariable Long id, @Valid @RequestBody PostUpdateRequest request){
+        return Result.success(postService.updatePostById(id, request));
     }
 }

@@ -5,9 +5,7 @@ import com.kmo.kome.dto.request.PostCreateRequest;
 import com.kmo.kome.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,5 +23,17 @@ public class PostController {
     @PostMapping("/api/admin/posts")
     public Result<Long> createPost(@Valid @RequestBody PostCreateRequest request){
         return Result.success(postService.createPost(request));
+    }
+
+    /**
+     * 删除指定 ID 的文章。
+     * 调用服务层方法根据文章 ID 删除对应的文章，并返回操作结果。
+     *
+     * @param id 要删除的文章 ID。
+     * @return 一个空的 {@code Result<Void>} 对象，表示删除操作的结果。
+     */
+    @DeleteMapping("/api/admin/posts/{id}")
+    public Result<Void> deletePost(@PathVariable Long id){
+        return Result.success(postService.deletePostById(id));
     }
 }

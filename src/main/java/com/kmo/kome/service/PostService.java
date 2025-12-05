@@ -13,4 +13,6 @@ import jakarta.validation.Valid;
  */
 public interface PostService extends IService<Post> {
     Long createPost(@Valid PostCreateRequest request);
+
+    Void deletePostById(Long id);
 }

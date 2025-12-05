@@ -28,7 +28,7 @@ public class Post {
     // 状态: 1=已发布, 0=草稿, 默认0
     private Integer status;
     // 是否置顶: 1=是, 0=否, 默认0
-    private Boolean isPined;
+    private Boolean isPinned;
     // 逻辑删除
     @TableLogic
     private Boolean isDeleted;

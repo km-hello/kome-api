@@ -141,6 +141,30 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
     }
 
     /**
+     * 根据文章别名（Slug）获取文章详情。
+     * 如果指定的文章不存在或未发布，则抛出业务异常。
+     *
+     * @param slug 文章的别名，用于唯一定位文章记录，不允许为空。
+     * @return 包含文章详细信息的响应对象，包含文章主表的所有字段。
+     * @throws ServiceException 如果文章不存在或未发布，则抛出包含 404 状态的业务异常。
+     */
+    @Override
+    public PostDetailResponse getPostBySlug(String slug) {
+        // 根据 slug 查询文章
+        Post post = this.lambdaQuery()
+                .eq(Post::getSlug, slug)
+                .one();
+        // 检查文章是否存在并且已发布
+        if(post == null || post.getStatus() == 0){
+            throw new ServiceException(ResultCode.NOT_FOUND, "文章不存在或未发布");
+        }
+
+        PostDetailResponse response = new PostDetailResponse();
+        BeanUtils.copyProperties(post, response);
+        return response;
+    }
+
+    /**
      * 检查文章的别名（Slug）是否唯一。
      * 如果指定的别名已存在，且不属于当前文章（通过文章 ID 排除），
      * 则抛出业务异常。

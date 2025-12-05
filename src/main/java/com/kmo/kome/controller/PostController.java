@@ -63,4 +63,16 @@ public class PostController {
     public Result<PostDetailResponse> getPostById(@PathVariable Long id){
         return Result.success(postService.getPostById(id));
     }
+
+    /**
+     * 根据文章的唯一标识符（slug）获取文章详情。
+     * 调用服务层方法查询指定 slug 的文章信息，并返回包含文章详情的结果对象。
+     *
+     * @param slug 文章的唯一标识符，用于精确定位文章。
+     * @return 包含文章详细信息的结果对象 {@code Result<PostDetailResponse>}。
+     */
+    @GetMapping("/api/posts/{slug}")
+    public Result<PostDetailResponse> getPostBySlug(@PathVariable String slug){
+        return Result.success(postService.getPostBySlug(slug));
+    }
 }

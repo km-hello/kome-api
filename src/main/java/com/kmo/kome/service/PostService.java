@@ -21,5 +21,7 @@ public interface PostService extends IService<Post> {
     Void updatePostById(Long id, @Valid PostUpdateRequest request);
 
     PostDetailResponse getPostById(Long id);
+
+    PostDetailResponse getPostBySlug(String slug);
 }
 

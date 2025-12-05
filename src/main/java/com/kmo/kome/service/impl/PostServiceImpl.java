@@ -31,6 +31,9 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
     @Override
     @Transactional
     public Long createPost(PostCreateRequest request) {
+        // 检查别名是否被占用
+        checkSlugUniqueness(request.getSlug(), null);
+
         // 保存文章
         Post newPost = new Post();
         BeanUtils.copyProperties(request, newPost);
@@ -100,6 +103,9 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
             throw new ServiceException(ResultCode.NOT_FOUND);
         }
 
+        // 检查别名是否被占用
+        checkSlugUniqueness(request.getSlug(), id);
+
         // 更新文章主表
         Post newPost = new Post();
         BeanUtils.copyProperties(request, newPost);
@@ -112,6 +118,31 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
 
         return null;
     }
+
+    /**
+     * 检查文章的别名（Slug）是否唯一。
+     * 如果指定的别名已存在，且不属于当前文章（通过文章 ID 排除），
+     * 则抛出业务异常。
+     *
+     * @param slug 待检查的文章别名，不允许为空。
+     * @param postId 当前文章的唯一标识符，用于排除自身的别名。如果为空，则不排除任何记录。
+     * @throws ServiceException 如果别名已存在，则抛出包含 400 状态的业务异常。
+     */
+    private void checkSlugUniqueness(String slug, Long postId) {
+        LambdaQueryWrapper<Post> queryWrapper = new LambdaQueryWrapper<Post>()
+                .eq(Post::getSlug, slug);
+
+        if(postId != null){
+            queryWrapper.ne(Post::getId, postId);
+        }
+
+        boolean isSlugTaken = this.baseMapper.exists(queryWrapper);
+
+        if(slug != null && isSlugTaken){
+            throw new ServiceException(ResultCode.BAD_REQUEST, "文章别名已被占用");
+        }
+    }
+
 
     /**
      * 更新指定文章的标签关联关系。

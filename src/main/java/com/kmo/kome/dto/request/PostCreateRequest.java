@@ -1,6 +1,7 @@
 package com.kmo.kome.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 import java.util.List;
@@ -15,6 +16,10 @@ import java.util.List;
 public class PostCreateRequest {
     @NotBlank(message = "文章标题不能为空")
     private String title;
+
+    @NotBlank(message = "文章别名不能为空")
+    @Pattern(regexp = "^[a-z0-9]+(?:-[a-z0-9]+)*$", message = "文章别名格式不正确")
+    private String slug;
 
     private String summary;
 

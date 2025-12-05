@@ -19,6 +19,7 @@ public class Post {
     @TableId(type = IdType.AUTO)
     private Long id;
     private String title;
+    private String slug;
     private String summary;
     private String content;
     private String coverImage;

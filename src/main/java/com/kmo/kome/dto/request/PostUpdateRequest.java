@@ -14,6 +14,8 @@ import java.util.List;
 public class PostUpdateRequest {
     private String title;
 
+    private String slug;
+
     private String summary;
 
     private String content;

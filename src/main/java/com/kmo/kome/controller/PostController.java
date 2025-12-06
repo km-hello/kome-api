@@ -1,9 +1,12 @@
 package com.kmo.kome.controller;
 
+import com.kmo.kome.common.PageResult;
 import com.kmo.kome.common.Result;
 import com.kmo.kome.dto.request.PostCreateRequest;
+import com.kmo.kome.dto.request.PostQueryRequest;
 import com.kmo.kome.dto.request.PostUpdateRequest;
 import com.kmo.kome.dto.response.PostDetailResponse;
+import com.kmo.kome.dto.response.PostSimpleResponse;
 import com.kmo.kome.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -74,5 +77,31 @@ public class PostController {
     @GetMapping("/api/posts/{slug}")
     public Result<PostDetailResponse> getPostBySlug(@PathVariable String slug){
         return Result.success(postService.getPostBySlug(slug));
+    }
+
+    /**
+     * 获取管理员文章分页列表。
+     * 根据传入的查询参数，返回符合条件的文章分页数据，包括每篇文章的概要信息。
+     *
+     * @param request 查询文章的请求参数，包含分页信息（页码和每页数量）、
+     *                关键词、标签筛选及状态筛选等字段。
+     * @return 包含文章分页数据的结果对象 {@code Result<PageResult<PostSimpleResponse>>}。
+     */
+    @GetMapping("/api/admin/posts")
+    public Result<PageResult<PostSimpleResponse>> getAdminPostPage(@Valid PostQueryRequest request){
+        return Result.success(postService.getAdminPostPage(request));
+    }
+
+    /**
+     * 获取公开文章的分页列表。
+     * 根据传入的查询参数，返回符合条件的公开文章分页数据，包括每篇文章的概要信息。
+     *
+     * @param request 查询文章的请求参数，包括分页信息（页码和每页数量）、
+     *                关键词、标签筛选及状态筛选等字段。
+     * @return 包含公开文章分页数据的结果对象 {@code Result<PageResult<PostSimpleResponse>>}。
+     */
+    @GetMapping("/api/posts")
+    public Result<PageResult<PostSimpleResponse>> getPublicPostPage(@Valid PostQueryRequest request){
+        return Result.success(postService.getPublicPostPage(request));
     }
 }

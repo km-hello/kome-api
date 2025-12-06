@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kmo.kome.mapper.PostMapper">
+
+    <select id="selectPostPage" resultType="com.kmo.kome.dto.response.PostSimpleResponse">
+        SELECT DISTINCT
+            p.id, p.title, p.slug, p.summary, p.cover_image, p.views, p.read_time, p.is_pinned, p.status, p.create_time
+        FROM
+            post p
+            <if test="query.tagId != null">
+                JOIN post_tag pt ON p.id = pt.post_id
+            </if>
+        <where>
+            p.is_deleted = 0
+            <if test="query.keyword != null and query.keyword != ''">
+                AND p.title LIKE CONCAT('%', #{query.keyword}, '%')
+            </if>
+            <if test="query.status != null">
+                AND p.status = #{query.status}
+            </if>
+            <if test="query.tagId != null">
+                AND pt.tag_id = #{query.tagId}
+            </if>
+        </where>
+        ORDER BY
+            p.is_pinned DESC, p.create_time DESC
+    </select>
+</mapper>

@@ -23,4 +23,21 @@
             t.id asc
     </select>
 
+
+    <select id="findTagsByPostIds" resultType="com.kmo.kome.dto.TagWhitPostIdDTO">
+        SELECT
+            pt.post_id,
+            t.id AS tag_id,
+            t.name AS tag_name
+        FROM
+            tag t
+        JOIN
+            post_tag pt ON t.id = pt.tag_id
+        WHERE
+            pt.post_id IN
+            <foreach item="postId" collection="postIds" open="(" separator="," close=")">
+                #{postId}
+            </foreach>
+    </select>
+
 </mapper>

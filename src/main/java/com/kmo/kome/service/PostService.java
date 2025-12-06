@@ -1,9 +1,12 @@
 package com.kmo.kome.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.kmo.kome.common.PageResult;
 import com.kmo.kome.dto.request.PostCreateRequest;
+import com.kmo.kome.dto.request.PostQueryRequest;
 import com.kmo.kome.dto.request.PostUpdateRequest;
 import com.kmo.kome.dto.response.PostDetailResponse;
+import com.kmo.kome.dto.response.PostSimpleResponse;
 import com.kmo.kome.entity.Post;
 import jakarta.validation.Valid;
 
@@ -23,5 +26,9 @@ public interface PostService extends IService<Post> {
     PostDetailResponse getPostById(Long id);
 
     PostDetailResponse getPostBySlug(String slug);
+
+    PageResult<PostSimpleResponse> getAdminPostPage(@Valid PostQueryRequest request);
+
+    PageResult<PostSimpleResponse> getPublicPostPage(@Valid PostQueryRequest request);
 }
 

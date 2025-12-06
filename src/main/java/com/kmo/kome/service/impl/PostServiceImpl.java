@@ -1,12 +1,17 @@
 package com.kmo.kome.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.kmo.kome.common.PageResult;
 import com.kmo.kome.common.ResultCode;
 import com.kmo.kome.common.exception.ServiceException;
+import com.kmo.kome.dto.TagWhitPostIdDTO;
 import com.kmo.kome.dto.request.PostCreateRequest;
+import com.kmo.kome.dto.request.PostQueryRequest;
 import com.kmo.kome.dto.request.PostUpdateRequest;
 import com.kmo.kome.dto.response.PostDetailResponse;
+import com.kmo.kome.dto.response.PostSimpleResponse;
 import com.kmo.kome.dto.response.TagResponse;
 import com.kmo.kome.entity.Post;
 import com.kmo.kome.entity.PostTag;
@@ -20,9 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -168,6 +171,80 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
 
         return buildPostDetailResponse(post);
     }
+
+    /**
+     * 获取已发布文章的分页列表。
+     * 根据提供的查询条件，仅查询状态为已发布的文章，并返回分页后的结果数据。
+     *
+     * @param request 查询请求对象，包括分页参数（页码和每页数量）、关键词过滤、标签筛选等字段。
+     *                该方法内部会自动设置状态为已发布（status=1）。
+     * @return 包含文章概要信息的分页结果对象。
+     */
+    @Override
+    public PageResult<PostSimpleResponse> getPublicPostPage(PostQueryRequest request) {
+        // 仅允许查询已发布的文章
+        request.setStatus(1);
+        return getAdminPostPage(request);
+    }
+
+
+    /**
+     * 获取后台管理文章分页列表。
+     * 根据提供的查询条件和分页参数，查询符合条件的文章主列表及其关联的标签信息，
+     * 并返回封装完成的分页结果。
+     *
+     * @param request 查询请求对象，包括分页参数（页码和每页数量）、关键词过滤、标签筛选以及状态筛选等字段。
+     * @return 包含文章概要信息和分页数据的结果对象。
+     */
+    @Override
+    public PageResult<PostSimpleResponse> getAdminPostPage(PostQueryRequest request) {
+        // 分页查询文章主列表
+        Page<Post> pageRequest = new Page<>(request.getPageNum(), request.getPageSize());
+        Page<PostSimpleResponse> postPage = this.baseMapper.selectPostPage(pageRequest, request);
+
+        List<PostSimpleResponse> posts = postPage.getRecords();
+        if(CollectionUtils.isEmpty(posts)){
+            return PageResult.<PostSimpleResponse>builder()
+                    .records(Collections.emptyList())
+                    .total(0L)
+                    .size(postPage.getSize())
+                    .current(postPage.getCurrent())
+                    .build();
+        };
+
+        // 批量获取关联的标签
+        List<Long> postIds = posts.stream()
+                .map(PostSimpleResponse::getId)
+                .toList();
+        List<TagWhitPostIdDTO> tagLinks = tagMapper.findTagsByPostIds(postIds);
+
+        // 组装数据
+        Map<Long, List<TagResponse>> postTagsMap = tagLinks.stream()
+                .collect(Collectors.groupingBy(
+                        TagWhitPostIdDTO::getPostId,
+                        Collectors.mapping(
+                                tagLink -> {
+                                    TagResponse tagResponse = new TagResponse();
+                                    tagResponse.setId(tagLink.getTagId());
+                                    tagResponse.setName(tagLink.getTagName());
+                                    return tagResponse;
+                                },
+                                Collectors.toList()
+                        )
+                ));
+        posts.forEach( post ->
+                post.setTags(postTagsMap.getOrDefault(post.getId(), Collections.emptyList())));
+
+        // 封装并返回数据
+        return PageResult.<PostSimpleResponse>builder()
+                .records(posts)
+                .total(postPage.getTotal())
+                .size(postPage.getSize())
+                .current(postPage.getCurrent())
+                .build();
+    }
+
+
 
     /**
      * 构建文章详情响应对象。

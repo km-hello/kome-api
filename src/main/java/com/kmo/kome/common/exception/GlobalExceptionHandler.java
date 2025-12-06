@@ -15,6 +15,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 
 /**
@@ -42,6 +43,20 @@ public class GlobalExceptionHandler {
         HttpStatus status = e.getHttpStatus();
         // 封装成 ResponseEntity 返回
         return new ResponseEntity<>(result, status);
+    }
+
+    /**
+     * 处理静态资源未找到异常的方法。
+     * 捕获 {@code NoResourceFoundException} 并返回统一的错误响应。
+     *
+     * @param e 捕获到的 {@code NoResourceFoundException} 异常对象，包含异常的详细信息。
+     * @return 一个 {@code ResponseEntity} 对象，其中包含封装好的错误信息 {@code Result} 实例，状态码为 404。
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Result<?>> handleNoResourceFoundException(NoResourceFoundException e){
+        log.warn("无静态资源: {}", e.getMessage());
+        Result<?> result = Result.fail(ResultCode.NOT_FOUND);
+        return new ResponseEntity<>(result, HttpStatus.NOT_FOUND);
     }
 
     /**

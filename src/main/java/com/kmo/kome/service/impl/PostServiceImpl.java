@@ -199,7 +199,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
     @Override
     public PageResult<PostSimpleResponse> getAdminPostPage(PostQueryRequest request) {
         // 分页查询文章主列表
-        Page<Post> pageRequest = new Page<>(request.getPageNum(), request.getPageSize());
+        Page<PostSimpleResponse> pageRequest = new Page<>(request.getPageNum(), request.getPageSize());
         Page<PostSimpleResponse> postPage = this.baseMapper.selectPostPage(pageRequest, request);
 
         List<PostSimpleResponse> posts = postPage.getRecords();

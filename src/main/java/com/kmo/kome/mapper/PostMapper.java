@@ -21,5 +21,5 @@ public interface PostMapper extends BaseMapper<Post> {
      * @param query 查询条件，包含关键词、标签筛选及状态筛选等参数。
      * @return 包含文章概要信息的分页结果。
      */
-    Page<PostSimpleResponse> selectPostPage(Page<Post> page, @Param("query")PostQueryRequest query);
+    Page<PostSimpleResponse> selectPostPage(Page<PostSimpleResponse> page, @Param("query")PostQueryRequest query);
 }

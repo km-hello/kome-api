@@ -1,12 +1,17 @@
 package com.kmo.kome.controller;
 
+import com.kmo.kome.common.PageResult;
 import com.kmo.kome.common.Result;
 import com.kmo.kome.dto.request.TagCreateRequest;
+import com.kmo.kome.dto.request.TagQueryRequest;
 import com.kmo.kome.dto.request.TagUpdateRequest;
+import com.kmo.kome.dto.response.TagPostCountResponse;
 import com.kmo.kome.dto.response.TagResponse;
 import com.kmo.kome.service.TagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 标签控制器类。
@@ -54,6 +59,29 @@ public class TagController {
     @DeleteMapping("/api/admin/tags/{id}")
     public Result<Void> deleteTagById(@PathVariable Long id){
         return Result.success(tagService.deleteTagById(id));
+    }
+
+    /**
+     * 分页查询标签信息及其对应的文章数量。
+     * 接收分页查询请求对象，返回分页结果，包括标签信息和文章数量。
+     *
+     * @param request 标签查询请求参数，包含分页页码和每页数量。
+     * @return 包含标签信息及文章数量的分页查询结果。
+     */
+    @GetMapping("/api/admin/tags")
+    public Result<PageResult<TagPostCountResponse>> getAdminTagPage(TagQueryRequest request){
+        return Result.success(tagService.getAdminTagPage(request));
+    }
+
+    /**
+     * 获取公共可见的标签及其对应的文章数量列表。
+     * 调用服务层方法，查询所有公开标签的信息并返回。
+     *
+     * @return 包含标签及其文章数量的结果对象列表。
+     */
+    @GetMapping("/api/tags")
+    public Result<List<TagPostCountResponse>> getPublicTagPage(){
+        return Result.success(tagService.getPublicTagList());
     }
 
 }

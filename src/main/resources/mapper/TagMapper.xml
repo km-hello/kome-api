@@ -4,10 +4,13 @@
 <mapper namespace="com.kmo.kome.mapper.TagMapper">
 
     <!--
-        功能: 根据单个文章ID查询其所有标签
-        用于: 文章详情页
-        id: 必须与TagMapper.java中的方法名一致
-        resultType: 返回的单个对象的类型
+        功能: 根据单个文章ID查询其关联的所有标签
+        - 使用场景:
+        -   在"文章详情"接口中，获取一篇文章对应的标签列表。
+        - 逻辑:
+        -   1. 从 post_tag (pt) 表中找到所有匹配 postId 的记录。
+        -   2. 使用 INNER JOIN 关联 tag (t) 表，获取每个标签的 id 和 name。
+        -   3. 这是一个典型的“根据ID查询关联数据”的操作，性能高效。
     -->
     <select id="findTagsByPostId" resultType="com.kmo.kome.dto.response.TagResponse">
         SELECT
@@ -23,7 +26,16 @@
             t.id asc
     </select>
 
-
+    <!--
+        功能: 根据多个文章ID批量查询它们各自关联的所有标签
+        - 使用场景:
+        -   在"文章分页列表"接口中，用于一次性获取当前页所有文章的标签数据，以避免N+1查询问题。
+        - 逻辑:
+        -   1. 使用 `IN` 子句，一次性查询出多个 post_id 对应的所有关联记录。
+        -   2. 同样使用 INNER JOIN 获取标签的详细信息。
+        -   3. 查询结果中必须包含 post_id，以便在Java代码中将标签分组并映射回对应的文章。
+        - 返回类型 (`TagWhitPostIdDTO`): 这个DTO除了包含标签信息(id, name)，还必须包含 post_id，这是后续数据组装的关键。
+    -->
     <select id="findTagsByPostIds" resultType="com.kmo.kome.dto.TagWhitPostIdDTO">
         SELECT
             pt.post_id,
@@ -38,6 +50,54 @@
             <foreach item="postId" collection="postIds" open="(" separator="," close=")">
                 #{postId}
             </foreach>
+    </select>
+
+    <!--
+        后台管理专用查询 (selectAdminTagPage)
+        - 逻辑:
+        - 1. 使用 LEFT JOIN, 保证所有标签都会被查询出来，即使 postCount 为 0。
+        - 2. 只关联 post_tag 表，不关联 post 表，因为我们不关心文章状态，这样性能更高。
+        - 3. COUNT(pt.post_id) 能正确计算出 0。
+    -->
+    <select id="selectAdminTagPage" resultType="com.kmo.kome.dto.response.TagPostCountResponse">
+        SELECT
+            t.id,
+            t.name,
+            COUNT(pt.post_id) AS post_count
+        FROM
+            tag t
+        LEFT JOIN
+            post_tag pt ON t.id = pt.tag_id
+        GROUP BY
+            t.id, t.name
+        ORDER BY
+            post_count DESC, t.id ASC
+    </select>
+
+    <!--
+        前台公开专用查询 (selectPublicTagList)
+        - 逻辑:
+        - 1. 使用 INNER JOIN, 效率更高, 能直接排除掉没有关联任何文章的标签。
+        - 2. 必须关联 post 表, 并在 WHERE 子句中严格筛选出 `status=1` 且 `is_deleted=0` 的文章。
+        - 3. 这样可以确保最终结果里的标签，都至少有一篇已发布的文章。
+    -->
+    <select id="selectPublicTagList" resultType="com.kmo.kome.dto.response.TagPostCountResponse">
+        SELECT
+            t.id,
+            t.name,
+            COUNT(p.id) AS post_count
+        FROM
+            tag t
+        INNER JOIN
+            post_tag pt ON t.id = pt.tag_id
+        INNER JOIN
+            post p on pt.post_id = p.id
+        WHERE
+            p.status = 1 AND p.is_deleted = 0
+        GROUP BY
+            t.id, t.name
+        ORDER BY
+            post_count DESC, t.id ASC
     </select>
 
 </mapper>

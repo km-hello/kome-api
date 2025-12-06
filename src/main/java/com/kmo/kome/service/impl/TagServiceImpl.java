@@ -1,9 +1,13 @@
 package com.kmo.kome.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.kmo.kome.common.PageResult;
 import com.kmo.kome.common.ResultCode;
 import com.kmo.kome.common.exception.ServiceException;
+import com.kmo.kome.dto.request.TagQueryRequest;
+import com.kmo.kome.dto.response.TagPostCountResponse;
 import com.kmo.kome.dto.response.TagResponse;
 import com.kmo.kome.entity.PostTag;
 import com.kmo.kome.entity.Tag;
@@ -12,6 +16,8 @@ import com.kmo.kome.mapper.TagMapper;
 import com.kmo.kome.service.TagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * 标签服务实现类
@@ -109,5 +115,40 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
         // 删除标签
         this.removeById(id);
         return null;
+    }
+
+    /**
+     * 获取后台管理系统的标签分页数据。
+     * 该方法用于查询包含标签及其关联文章数量的分页结果，返回的数据用于后台管理系统展示。
+     *
+     * @param request 标签查询请求，包含分页参数（页码和每页数量）。
+     * @return 包含标签及其关联文章数量信息的分页结果。
+     */
+    @Override
+    public PageResult<TagPostCountResponse> getAdminTagPage(TagQueryRequest request) {
+        // 创建分页请求
+        Page<TagPostCountResponse> pageRequest = new Page<>(request.getPageNum(), request.getPageSize());
+
+        // 调用为后台管理接口定制的 Mapper 方法
+        Page<TagPostCountResponse> tagPage = this.baseMapper.selectAdminTagPage(pageRequest);
+
+        // 封装返回结果
+        return PageResult.<TagPostCountResponse>builder()
+                .records(tagPage.getRecords())
+                .total(tagPage.getTotal())
+                .size(tagPage.getSize())
+                .current(tagPage.getCurrent())
+                .build();
+    }
+
+    /**
+     * 获取所有公开标签的列表，包括标签及其关联文章的数量。
+     * 该方法常用于前端展示公开标签信息的场景。
+     *
+     * @return 包含标签及其文章数量信息的列表
+     */
+    @Override
+    public List<TagPostCountResponse> getPublicTagList() {
+        return this.baseMapper.selectPublicTagList();
     }
 }

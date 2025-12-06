@@ -9,5 +9,7 @@ import com.kmo.kome.entity.Tag;
 public interface TagService extends IService<Tag> {
     TagResponse createTag(String name);
 
-    TagResponse updateTag(Long id, String name);
+    TagResponse updateTagById(Long id, String name);
+
+    Void deleteTagById(Long id);
 }

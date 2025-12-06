@@ -40,8 +40,20 @@ public class TagController {
      * @return 包含更新后标签信息的结果对象。
      */
     @PutMapping("/api/admin/tags/{id}")
-    public Result<TagResponse> updateTag(@PathVariable Long id, @RequestBody TagUpdateRequest request){
-        return Result.success(tagService.updateTag(id, request.getName()));
+    public Result<TagResponse> updateTagById(@PathVariable Long id, @RequestBody TagUpdateRequest request){
+        return Result.success(tagService.updateTagById(id, request.getName()));
+    }
+
+    /**
+     * 根据指定的标签 ID 删除标签。
+     * 调用服务层方法删除标签，并返回操作结果。
+     *
+     * @param id 要删除的标签 ID。
+     * @return 一个空的 {@code Result<Void>} 对象，表示删除操作的结果。
+     */
+    @DeleteMapping("/api/admin/tags/{id}")
+    public Result<Void> deleteTagById(@PathVariable Long id){
+        return Result.success(tagService.deleteTagById(id));
     }
 
 }

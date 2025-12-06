@@ -5,9 +5,12 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.kmo.kome.common.ResultCode;
 import com.kmo.kome.common.exception.ServiceException;
 import com.kmo.kome.dto.response.TagResponse;
+import com.kmo.kome.entity.PostTag;
 import com.kmo.kome.entity.Tag;
+import com.kmo.kome.mapper.PostTagMapper;
 import com.kmo.kome.mapper.TagMapper;
 import com.kmo.kome.service.TagService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 /**
@@ -16,7 +19,12 @@ import org.springframework.stereotype.Service;
  * 通过继承 ServiceImpl<TagMapper, Tag> 实现通用的增删查改功能，并加入特定的业务约束。
  */
 @Service
+@RequiredArgsConstructor
 public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagService {
+
+    private final PostTagMapper postTagMapper;
+
+
     /**
      * 创建一个新的标签。如果标签名称已存在，则抛出业务异常。
      *
@@ -50,7 +58,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
      * @throws ServiceException 如果标签不存在或名称已被占用
      */
     @Override
-    public TagResponse updateTag(Long id, String name) {
+    public TagResponse updateTagById(Long id, String name) {
         Tag oldTag = this.getById(id);
         if(oldTag == null){
             throw new ServiceException(ResultCode.NOT_FOUND);
@@ -69,5 +77,37 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
         newTag.setName(name);
         this.updateById(newTag);
         return new TagResponse(newTag.getId(), newTag.getName());
+    }
+
+    /**
+     * 根据主键 ID 删除指定的标签。
+     * 在删除标签之前，会执行以下业务逻辑验证：
+     * 1. 检查标签是否存在，若不存在则抛出 {@code ServiceException} 异常。
+     * 2. 检查标签是否被使用，如果存在关联的文章则抛出 {@code ServiceException} 异常。
+     *
+     * @param id 要删除的标签的唯一标识
+     * @return 被删除的标签信息，如果标签不存在或无法删除则会抛出异常
+     * @throws ServiceException 如果标签不存在，抛出 {@code ResultCode.NOT_FOUND} 异常。
+     *                          如果标签正在被使用，抛出 {@code ResultCode.FORBIDDEN} 异常，并附上错误原因。
+     */
+    @Override
+    public Void deleteTagById(Long id) {
+        // 检查标签是否存在
+        Tag tag = this.getById(id);
+        if(tag == null){
+            throw new ServiceException(ResultCode.NOT_FOUND);
+        }
+
+        // 检查标签是否在使用中
+        Long postCount = postTagMapper.selectCount(
+                new LambdaQueryWrapper<PostTag>().eq(PostTag::getTagId, id)
+        );
+        if(postCount > 0){
+            String errorMessage = String.format("无法删除标签 '%s'，有 %d 篇文章正在使用它。", tag.getName(), postCount);
+            throw new ServiceException(ResultCode.FORBIDDEN, errorMessage);
+        }
+        // 删除标签
+        this.removeById(id);
+        return null;
     }
 }

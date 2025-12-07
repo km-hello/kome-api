@@ -2,14 +2,13 @@ package com.kmo.kome.security;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.kmo.kome.entity.User;
-import com.kmo.kome.mapper.UserMapper;
-import lombok.RequiredArgsConstructor;
+import com.kmo.kome.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
 
 /**
  * Spring Security 用户详情加载服务
@@ -17,10 +16,27 @@ import java.util.Collections;
  * 实现 UserDetailsService 接口，用于在认证过程中从数据库查找用户信息。
  */
 @Service
-@RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    private final UserMapper userMapper;
+    private UserService userService;
+
+    @Autowired
+    private ApplicationContext applicationContext;
+
+
+    /**
+     * 获取 UserService 实例。
+     * 如果未初始化 UserService，则从 Spring 容器中获取并赋值给本地变量。
+     * 懒加载方法，打破循环依赖
+     *
+     * @return UserService 实例，用于执行用户相关的业务逻辑。
+     */
+    private UserService getUserService() {
+        if (userService == null) {
+            userService = applicationContext.getBean(UserService.class);
+        }
+        return userService;
+    }
 
     /**
      * 根据用户名加载用户
@@ -31,8 +47,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // 1. 查询数据库
-        User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
+        // 1. 查询数据库（改用懒加载）
+        User user = getUserService().getOne(new LambdaQueryWrapper<User>()
                 .eq(User::getUsername, username));
 
         // 2. 检查用户是否存在

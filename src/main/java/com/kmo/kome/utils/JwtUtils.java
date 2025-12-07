@@ -48,7 +48,6 @@ public class JwtUtils {
      */
     public String generateToken(Long userId) {
         return Jwts.builder()
-                .header().add("typ", "JWT").and() // 可选: 添加 Header 标识
                 .subject(String.valueOf(userId)) // 主题 (Subject) 设置为 userId 的字符串形式
                 .issuedAt(new Date()) // 设置签发时间
                 .expiration(new Date(System.currentTimeMillis() + expiration)) // 设置过期时间

@@ -181,9 +181,11 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
         }
 
         // 增加阅读量逻辑（原子递增，避免并发问题）
+        // 使用 update_time = update_time 防止 ON UPDATE CURRENT_TIMESTAMP 触发
+        // 这样只更新 views，不更新 update_time
         update(Wrappers.<Post>lambdaUpdate()
                 .eq(Post::getId, post.getId())
-                .setSql("views = views + 1")
+                .setSql("views = views + 1, update_time = update_time")
         );
 
         return buildPostDetailResponse(post);

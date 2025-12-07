@@ -21,6 +21,7 @@ import com.kmo.kome.mapper.PostMapper;
 import com.kmo.kome.service.PostService;
 import com.kmo.kome.service.PostTagService;
 import com.kmo.kome.service.TagService;
+import com.kmo.kome.utils.PostUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
 
     private final PostTagService postTagService;
     private final TagService tagService;
+    private final PostUtils postUtils;
 
     /**
      * 创建新文章。
@@ -59,7 +61,8 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
         // 保存文章
         Post newPost = new Post();
         BeanUtils.copyProperties(request, newPost);
-        // TODO 计算阅读时间
+        // 计算阅读时间
+        newPost.setReadTime(postUtils.calculateReadTime(request.getContent()));
         save(newPost);
 
         // 处理关联标签 (统一使用 resetPostTags 处理关联)
@@ -126,7 +129,8 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
         Post newPost = new Post();
         BeanUtils.copyProperties(request, newPost);
         newPost.setId(id);
-        // TODO 计算阅读时间
+        // 更新阅读时间
+        newPost.setReadTime(postUtils.calculateReadTime(request.getContent()));
         updateById(newPost);
 
         // 更新关联标签 (统一使用 resetPostTags 处理关联)

@@ -1,6 +1,7 @@
 package com.kmo.kome.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.kmo.kome.common.PageResult;
@@ -83,11 +84,11 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
         }
 
         // 更新标签名称
-        Tag newTag = new Tag();
-        newTag.setId(id);
-        newTag.setName(name);
-        updateById(newTag);
-        return new TagResponse(newTag.getId(), newTag.getName());
+        update(Wrappers.<Tag>lambdaUpdate()
+                .eq(Tag::getId, id)
+                .set(Tag::getName, name)
+        );
+        return new TagResponse(id, name);
     }
 
     /**

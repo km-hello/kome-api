@@ -16,12 +16,6 @@ import jakarta.validation.Valid;
  */
 public interface UserService extends IService<User> {
 
-    /**
-     * 处理用户登录业务
-     *
-     * @param request 登录请求参数
-     * @return 登录成功后的响应数据 (Token等)
-     */
     UserLoginResponse login(UserLoginRequest request);
 
     UserInfoResponse getUserInfoById(Long currentUserId);

@@ -6,13 +6,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.kmo.kome.common.PageResult;
 import com.kmo.kome.common.ResultCode;
 import com.kmo.kome.common.exception.ServiceException;
+import com.kmo.kome.dto.TagWhitPostIdDTO;
 import com.kmo.kome.dto.request.TagQueryRequest;
 import com.kmo.kome.dto.response.TagPostCountResponse;
 import com.kmo.kome.dto.response.TagResponse;
 import com.kmo.kome.entity.PostTag;
 import com.kmo.kome.entity.Tag;
-import com.kmo.kome.mapper.PostTagMapper;
 import com.kmo.kome.mapper.TagMapper;
+import com.kmo.kome.service.PostTagService;
 import com.kmo.kome.service.TagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagService {
 
-    private final PostTagMapper postTagMapper;
+    private final PostTagService postTagService;
 
 
     /**
@@ -40,17 +41,18 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
      */
     @Override
     public TagResponse createTag(String name) {
-        Tag tag = this.getOne(
+        // 检查标签是否已存在
+        Tag tag = getOne(
                 new LambdaQueryWrapper<Tag>().eq(Tag::getName, name)
         );
-
-        if(tag != null){
+        if (tag != null) {
             throw new ServiceException(ResultCode.BAD_REQUEST, "标签已存在");
         }
 
+        // 创建新标签
         Tag newTag = new Tag();
         newTag.setName(name);
-        this.save(newTag);
+        save(newTag);
         return new TagResponse(newTag.getId(), newTag.getName());
     }
 
@@ -58,30 +60,33 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
      * 更新指定的标签信息。
      * 如果标签不存在或新的标签名称已被占用，则抛出业务异常。
      *
-     * @param id 要更新的标签的唯一标识
+     * @param id   要更新的标签的唯一标识
      * @param name 要更新的标签的新名称
      * @return 更新后的标签信息
      * @throws ServiceException 如果标签不存在或名称已被占用
      */
     @Override
     public TagResponse updateTagById(Long id, String name) {
-        Tag oldTag = this.getById(id);
-        if(oldTag == null){
+        // 检查标签是否存在
+        Tag oldTag = getById(id);
+        if (oldTag == null) {
             throw new ServiceException(ResultCode.NOT_FOUND);
         }
 
-        boolean isTagNameTaken = this.lambdaQuery()
+        // 检查新标签名是否被占用
+        boolean isTagNameTaken = lambdaQuery()
                 .eq(Tag::getName, name)
                 .ne(Tag::getId, id)
                 .exists();
-        if(isTagNameTaken){
+        if (isTagNameTaken) {
             throw new ServiceException(ResultCode.BAD_REQUEST, "标签名称已被占用");
         }
 
+        // 更新标签名称
         Tag newTag = new Tag();
         newTag.setId(id);
         newTag.setName(name);
-        this.updateById(newTag);
+        updateById(newTag);
         return new TagResponse(newTag.getId(), newTag.getName());
     }
 
@@ -99,21 +104,21 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
     @Override
     public Void deleteTagById(Long id) {
         // 检查标签是否存在
-        Tag tag = this.getById(id);
-        if(tag == null){
+        Tag tag = getById(id);
+        if (tag == null) {
             throw new ServiceException(ResultCode.NOT_FOUND);
         }
 
         // 检查标签是否在使用中
-        Long postCount = postTagMapper.selectCount(
+        long postCount = postTagService.count(
                 new LambdaQueryWrapper<PostTag>().eq(PostTag::getTagId, id)
         );
-        if(postCount > 0){
+        if (postCount > 0) {
             String errorMessage = String.format("无法删除标签 '%s'，有 %d 篇文章正在使用它。", tag.getName(), postCount);
             throw new ServiceException(ResultCode.FORBIDDEN, errorMessage);
         }
         // 删除标签
-        this.removeById(id);
+        removeById(id);
         return null;
     }
 
@@ -130,7 +135,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
         Page<TagPostCountResponse> pageRequest = new Page<>(request.getPageNum(), request.getPageSize());
 
         // 调用为后台管理接口定制的 Mapper 方法
-        Page<TagPostCountResponse> tagPage = this.baseMapper.selectAdminTagPage(pageRequest);
+        Page<TagPostCountResponse> tagPage = baseMapper.selectAdminTagPage(pageRequest);
 
         // 封装返回结果
         return PageResult.<TagPostCountResponse>builder()
@@ -149,6 +154,31 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
      */
     @Override
     public List<TagPostCountResponse> getPublicTagList() {
-        return this.baseMapper.selectPublicTagList();
+        return baseMapper.selectPublicTagList();
+    }
+
+
+    /**
+     * 根据文章 ID 查询关联的标签列表。
+     * 此方法封装了对数据库的查询操作，用于获取指定文章所关联的所有标签。
+     *
+     * @param postId 文章的唯一标识，用于查找其关联的标签。
+     * @return 包含标签信息的列表，每个元素表示一个标签。
+     */
+    @Override
+    public List<TagResponse> findTagsByPostId(Long postId) {
+        return baseMapper.findTagsByPostId(postId);
+    }
+
+    /**
+     * 根据文章 ID 列表查询关联的标签信息。
+     * 此方法封装了对数据库的查询操作，用于批量获取指定文章所关联的所有标签。
+     *
+     * @param postIds 文章 ID 的列表，用于批量查找每篇文章的关联标签。
+     * @return 包含帖子 ID 和其对应标签信息的列表，每个元素表示一篇文章的标签详情。
+     */
+    @Override
+    public List<TagWhitPostIdDTO> findTagsByPostIds(List<Long> postIds) {
+        return baseMapper.findTagsByPostIds(postIds);
     }
 }

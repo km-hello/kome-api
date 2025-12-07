@@ -17,9 +17,9 @@ import com.kmo.kome.entity.Post;
 import com.kmo.kome.entity.PostTag;
 import com.kmo.kome.entity.Tag;
 import com.kmo.kome.mapper.PostMapper;
-import com.kmo.kome.mapper.TagMapper;
 import com.kmo.kome.service.PostService;
 import com.kmo.kome.service.PostTagService;
+import com.kmo.kome.service.TagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements PostService {
 
     private final PostTagService postTagService;
-    private final TagMapper tagMapper;
+    private final TagService tagService;
 
     /**
      * 创建新文章。
@@ -59,7 +59,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
         Post newPost = new Post();
         BeanUtils.copyProperties(request, newPost);
         // TODO 计算阅读时间
-        this.save(newPost);
+        save(newPost);
 
         // 处理关联标签 (统一使用 resetPostTags 处理关联)
         resetPostTags(newPost.getId(), request.getTagIds());
@@ -80,7 +80,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
     @Transactional
     public Void deletePostById(Long id) {
         // 检查 post 是否存在
-        Post post = this.getById(id);
+        Post post = getById(id);
         if(post == null){
             throw new ServiceException(ResultCode.NOT_FOUND, "未找到该文章");
         }
@@ -92,7 +92,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
         );
 
         // 删除文章
-        this.removeById(id);
+        removeById(id);
         return null;
     }
 
@@ -110,7 +110,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
     @Transactional
     public Void updatePostById(Long id, PostUpdateRequest request) {
         // 检查文章是否存在
-        Post oldPost = this.getById(id);
+        Post oldPost = getById(id);
         if(oldPost == null){
             throw new ServiceException(ResultCode.NOT_FOUND);
         }
@@ -126,7 +126,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
         BeanUtils.copyProperties(request, newPost);
         newPost.setId(id);
         // TODO 计算阅读时间
-        this.updateById(newPost);
+        updateById(newPost);
 
         // 更新关联标签 (统一使用 resetPostTags 处理关联)
         resetPostTags(id, request.getTagIds());
@@ -145,7 +145,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
     @Override
     public PostDetailResponse getPostById(Long id) {
         // 根据 id 查询文章
-        Post post = this.getById(id);
+        Post post = getById(id);
         if(post == null){
             throw new ServiceException(ResultCode.NOT_FOUND);
         }
@@ -167,7 +167,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
     @Override
     public PostDetailResponse getPostBySlug(String slug) {
         // 根据 slug 查询文章
-        Post post = this.lambdaQuery()
+        Post post = lambdaQuery()
                 .eq(Post::getSlug, slug)
                 .one();
         // 检查文章是否存在并且已发布
@@ -195,7 +195,6 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
         return getAdminPostPage(request);
     }
 
-
     /**
      * 获取后台管理文章分页列表。
      * 根据提供的查询条件和分页参数，查询符合条件的文章主列表及其关联的标签信息，
@@ -208,7 +207,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
     public PageResult<PostSimpleResponse> getAdminPostPage(PostQueryRequest request) {
         // 分页查询文章主列表
         Page<PostSimpleResponse> pageRequest = new Page<>(request.getPageNum(), request.getPageSize());
-        Page<PostSimpleResponse> postPage = this.baseMapper.selectPostPage(pageRequest, request);
+        Page<PostSimpleResponse> postPage = baseMapper.selectPostPage(pageRequest, request);
 
         List<PostSimpleResponse> posts = postPage.getRecords();
         if(CollectionUtils.isEmpty(posts)){
@@ -224,7 +223,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
         List<Long> postIds = posts.stream()
                 .map(PostSimpleResponse::getId)
                 .toList();
-        List<TagWhitPostIdDTO> tagLinks = tagMapper.findTagsByPostIds(postIds);
+        List<TagWhitPostIdDTO> tagLinks = tagService.findTagsByPostIds(postIds);
 
         // 组装数据
         Map<Long, List<TagResponse>> postTagsMap = tagLinks.stream()
@@ -268,7 +267,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
         BeanUtils.copyProperties(post, response);
 
         // 查询并设置标签列表
-        List<TagResponse> tags = tagMapper.findTagsByPostId(post.getId());
+        List<TagResponse> tags = tagService.findTagsByPostId(post.getId());
         response.setTags(tags);
 
         return response;
@@ -292,7 +291,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
             queryWrapper.ne(Post::getId, postId);
         }
 
-        boolean isSlugTaken = this.exists(queryWrapper);
+        boolean isSlugTaken = exists(queryWrapper);
 
         if(slug != null && isSlugTaken){
             throw new ServiceException(ResultCode.BAD_REQUEST, "文章别名已被占用");
@@ -318,7 +317,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
         List<Long> distinctTagIds = tagIds.stream().distinct().toList();
 
         // 2. 批量查询数据库中存在的数量
-        Long count = tagMapper.selectCount(
+        long count = tagService.count(
                 new LambdaQueryWrapper<Tag>().in(Tag::getId, distinctTagIds)
         );
 

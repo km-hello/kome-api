@@ -116,7 +116,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 检查用户名是否被占用
         String newUsername = request.getUsername();
         if(StringUtils.hasText(newUsername) && !newUsername.equals(user.getUsername())){
-            boolean isUsernameTaken = this.lambdaQuery()
+            boolean isUsernameTaken = lambdaQuery()
                     .eq(User::getUsername, newUsername)
                     .ne(User::getId, user.getId())
                     .exists();
@@ -134,10 +134,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         // 执行更新
         // MyBatis Plus 的 updateById 会忽略 userToUpdate 中的 null 字段
-        this.updateById(updateUser);
+        updateById(updateUser);
 
         // 返回更新后的用户信息
-        User updatedUser = this.getById(currentUserId);
+        User updatedUser = getById(currentUserId);
         UserInfoResponse response = new UserInfoResponse();
         BeanUtils.copyProperties(updatedUser, response);
 
@@ -171,7 +171,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String encodePassword = passwordEncoder.encode(request.getNewPassword());
 
         // 使用 Wrappers 工厂类，并只更新 password 字段
-        this.update(Wrappers.<User>lambdaUpdate()
+        update(Wrappers.<User>lambdaUpdate()
                 .eq(User::getId, currentUserId)
                 .set(User::getPassword, encodePassword)
         );
@@ -192,7 +192,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
 
         // 检查用户是否存在
-        User user = this.getById(currentUserId);
+        User user = getById(currentUserId);
         if(user == null){
             throw new ServiceException(ResultCode.NOT_FOUND);
         }

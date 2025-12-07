@@ -12,6 +12,11 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+/**
+ * 标签数据访问层接口
+ * 继承自 BaseMapper<Tag>，提供对标签 (tag) 表的基础 CRUD 功能。
+ * 该接口定义了一些围绕标签的自定义查询方法，用于支持业务需求。
+ */
 @Mapper
 public interface TagMapper extends BaseMapper<Tag> {
     /**

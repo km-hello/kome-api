@@ -15,10 +15,11 @@ import com.kmo.kome.dto.response.PostSimpleResponse;
 import com.kmo.kome.dto.response.TagResponse;
 import com.kmo.kome.entity.Post;
 import com.kmo.kome.entity.PostTag;
+import com.kmo.kome.entity.Tag;
 import com.kmo.kome.mapper.PostMapper;
-import com.kmo.kome.mapper.PostTagMapper;
 import com.kmo.kome.mapper.TagMapper;
 import com.kmo.kome.service.PostService;
+import com.kmo.kome.service.PostTagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -32,14 +33,27 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements PostService {
 
-    private final PostTagMapper postTagMapper;
+    private final PostTagService postTagService;
     private final TagMapper tagMapper;
 
+    /**
+     * 创建新文章。
+     * 该方法用于保存一篇新文章，同时进行必要的校验工作，包括检查文章别名的唯一性、
+     * 验证关联标签的合法性，并处理文章与标签的关联关系。
+     *
+     * @param request 创建文章的请求对象，包含文章的标题、内容、摘要、状态、标签等必要的信息。
+     *                不能为 null，并且必须提供有效的标题、内容和标签信息。
+     * @return 新创建的文章的唯一标识符（主键 ID）。
+     * @throws ServiceException 如果文章别名重复或关联的标签无效，则抛出包含对应错误信息的业务异常。
+     */
     @Override
     @Transactional
     public Long createPost(PostCreateRequest request) {
         // 检查别名是否被占用
         checkSlugUniqueness(request.getSlug(), null);
+
+        // 校验标签合法性 (Fail-Fast: 如果标签不存在，直接报错，不进行后续 Insert)
+        validateTagIds(request.getTagIds());
 
         // 保存文章
         Post newPost = new Post();
@@ -47,17 +61,8 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
         // TODO 计算阅读时间
         this.save(newPost);
 
-        // 处理关联标签
-        List<Long> tagIds = request.getTagIds();
-        if(tagIds != null && !tagIds.isEmpty()){
-            List<PostTag> postTagList = tagIds.stream().map(tagId ->{
-                PostTag postTag = new PostTag();
-                postTag.setPostId(newPost.getId());
-                postTag.setTagId(tagId);
-                return postTag;
-            }).toList();
-            postTagList.forEach(this.postTagMapper::insert);
-        }
+        // 处理关联标签 (统一使用 resetPostTags 处理关联)
+        resetPostTags(newPost.getId(), request.getTagIds());
 
         return newPost.getId();
     }
@@ -81,7 +86,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
         }
 
         // 删除 post_tag 关联表中的相关记录
-        postTagMapper.delete(
+        postTagService.remove(
                 new LambdaQueryWrapper<PostTag>()
                         .eq(PostTag::getPostId, id)
         );
@@ -113,6 +118,9 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
         // 检查别名是否被占用
         checkSlugUniqueness(request.getSlug(), id);
 
+        // 检查标签合法性
+        validateTagIds(request.getTagIds());
+
         // 更新文章主表
         Post newPost = new Post();
         BeanUtils.copyProperties(request, newPost);
@@ -120,8 +128,8 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
         // TODO 计算阅读时间
         this.updateById(newPost);
 
-        // 更新关联标签
-        updatePostTags(id, request.getTagIds());
+        // 更新关联标签 (统一使用 resetPostTags 处理关联)
+        resetPostTags(id, request.getTagIds());
 
         return null;
     }
@@ -284,69 +292,72 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
             queryWrapper.ne(Post::getId, postId);
         }
 
-        boolean isSlugTaken = this.baseMapper.exists(queryWrapper);
+        boolean isSlugTaken = this.exists(queryWrapper);
 
         if(slug != null && isSlugTaken){
             throw new ServiceException(ResultCode.BAD_REQUEST, "文章别名已被占用");
         }
     }
 
+    /**
+     * 验证标签 ID 列表的有效性。
+     * 该方法用于检查传入的标签 ID 列表是否存在空值或无效数据。
+     * 首先对标签 ID 进行去重操作，防止前端传入重复值导致逻辑错误；
+     * 然后查询数据库确认所有标签 ID 是否有效；
+     * 最后如果检测到无效的标签 ID，则抛出业务异常。
+     *
+     * @param tagIds 待验证的标签 ID 列表，不能为 null，且必须包含有效的标签 ID。
+     *               如果列表为空或存在不存在的标签 ID，会抛出对应的业务异常。
+     * @throws ServiceException 如果标签列表为空，或包含不存在的标签 ID，则抛出对应的异常。
+     */
+    private void validateTagIds(List<Long> tagIds){
+        if(CollectionUtils.isEmpty(tagIds)){
+            return;
+        }
+        // 1. 去重：防止前端传[1, 1]导致数量对比出错
+        List<Long> distinctTagIds = tagIds.stream().distinct().toList();
+
+        // 2. 批量查询数据库中存在的数量
+        Long count = tagMapper.selectCount(
+                new LambdaQueryWrapper<Tag>().in(Tag::getId, distinctTagIds)
+        );
+
+        // 3. 对比：如果查出来的数量 ！= 请求的数量，说明有 ID 不存在
+        if(count != distinctTagIds.size()){
+            throw new ServiceException(ResultCode.BAD_REQUEST, "包含不存在的标签");
+        }
+    }
+
 
     /**
-     * 更新指定文章的标签关联关系。
-     * 此方法根据提供的新标签 ID 列表更新文章的标签关联：
-     * - 如果新标签列表为空，则移除文章的所有标签。
-     * - 删除新标签列表中没有但旧标签列表中存在的标签关联。
-     * - 添加新标签列表中存在但旧标签列表中没有的标签关联。
+     * 重置指定文章的标签关联关系。
+     * 该方法会先清除文章的所有旧标签关联，然后根据提供的新标签 ID 列表添加新的关联记录。
+     * 如果新标签列表为空，则表示清空所有关联的标签。
      *
-     * @param postId 文章的唯一标识符
-     * @param newTagIds 新的标签 ID 列表。如果为空，则移除文章的所有标签。
+     * @param postId 文章的唯一标识符，用于定位需要重置标签关联的目标文章。
+     * @param tagIds 新的标签 ID 列表，如果为空则清空所有关联标签。
      */
-    private void updatePostTags(Long postId, List<Long> newTagIds) {
-        // 查询当前文章已有的所有标签关联
-        List<PostTag> oldPostTags = postTagMapper.selectList(
+    private void resetPostTags(Long postId, List<Long> tagIds) {
+        // 1. 无论原来有没有，先删除旧关联 (对于新建文章，这一步删了个寂寞，但不影响逻辑)
+        postTagService.remove(
                 new LambdaQueryWrapper<PostTag>().eq(PostTag::getPostId, postId)
         );
 
-        Set<Long> oldTagIdsSet = oldPostTags.stream()
-                .map(PostTag::getTagId)
-                .collect(Collectors.toSet());
-
-        // 如果新标签列表为空，则直接删除所有旧标签
-        if(CollectionUtils.isEmpty(newTagIds)){
-            if(!oldTagIdsSet.isEmpty()){
-                postTagMapper.delete(new LambdaQueryWrapper<PostTag>().eq(PostTag::getPostId, postId));
-            }
+        // 2. 如果新标签列表为空，说明是清空标签，直接返回
+        if(CollectionUtils.isEmpty(tagIds)){
             return;
         }
 
-        // 计算差集，进行增删操作
-        Set<Long> newTagIdsSet = new HashSet<>(newTagIds);
-        // 计算需要删除的关联，在 oldTagIds 中存在，但在 newTagIdsSet 中不存在
-        List<Long> tagsToDelete = oldTagIdsSet.stream()
-                .filter(tagId -> !newTagIdsSet.contains(tagId))
-                .toList();
-
-        if(!tagsToDelete.isEmpty()){
-            postTagMapper.delete(
-                    new LambdaQueryWrapper<PostTag>()
-                    .eq(PostTag::getPostId, postId)
-                    .in(PostTag::getTagId, tagsToDelete)
-            );
-        }
-
-        // 计算需要新增的关联，在 newTagIdsSet 中存在，但在 oldTagIds 中不存在
-        List<Long> tagsToAdd = newTagIdsSet.stream()
-                .filter(tagId -> !oldTagIdsSet.contains(tagId))
-                .toList();
-        if(!tagsToAdd.isEmpty()){
-            tagsToAdd.forEach(tagId -> {
-                PostTag postTag = new PostTag();
-                postTag.setPostId(postId);
-                postTag.setTagId(tagId);
-                postTagMapper.insert(postTag);
-            });
-        }
-        return;
+        // 3. 插入新关联
+        // 去重，防止数据库唯一索引冲突
+        List<Long> uniqueTagIds = tagIds.stream().distinct().toList();
+        List<PostTag> postTagList = uniqueTagIds.stream().map(tagId -> {
+            PostTag postTag = new PostTag();
+            postTag.setPostId(postId);
+            postTag.setTagId(tagId);
+            return postTag;
+        }).toList();
+        // 批量插入
+        postTagService.saveBatch(postTagList);
     }
 }

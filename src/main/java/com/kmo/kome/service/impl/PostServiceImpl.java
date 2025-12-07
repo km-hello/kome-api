@@ -1,6 +1,7 @@
 package com.kmo.kome.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.kmo.kome.common.PageResult;
@@ -175,7 +176,11 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
             throw new ServiceException(ResultCode.NOT_FOUND, "文章不存在或未发布");
         }
 
-        // TODO 增加阅读量逻辑
+        // 增加阅读量逻辑（原子递增，避免并发问题）
+        update(Wrappers.<Post>lambdaUpdate()
+                .eq(Post::getId, post.getId())
+                .setSql("views = views + 1")
+        );
 
         return buildPostDetailResponse(post);
     }

@@ -26,9 +26,9 @@ public class User {
     private String email;
     private String description;
 
-    // 逻辑删除字段: 1-已删除, 0-正常 (MyBatis Plus会自动处理)
+    // 逻辑删除字段 (MyBatis Plus会自动处理)
     @TableLogic
-    private Integer isDeleted;
+    private Boolean isDeleted;
 
     private LocalDateTime createTime;
     private LocalDateTime updateTime;

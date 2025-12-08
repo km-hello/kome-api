@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kmo.kome.mapper.PostMapper">
+
+    <!--
+        功能: 分页查询文章简要信息列表，支持多种动态查询条件。
+        - 使用场景:
+        -   后台文章管理列表 (`/api/admin/posts`)。
+        -   前台公开文章列表，如首页、归档页、标签/分类下的文章列表 (`/api/posts`)。
+        - 逻辑:
+        -   1. 这是一个核心的 **动态SQL查询**，使用 `<if>` 和 `<where>` 标签根据传入的 `query` 对象动态构建查询条件。
+        -   2. 支持的过滤条件包括：按 **关键词(keyword)** 模糊搜索文章标题、按 **文章状态(status)** 筛选、按 **标签ID(tagId)** 筛选。
+        -   3. **性能优化**: 只有当需要按 `tagId` 筛选时，才会 `JOIN` `post_tag` 关联表，避免了不必要的表连接。
+        -   4. **DISTINCT 关键字**: 因为 `post` 与 `post_tag` 是“一对多”关系，为防止未来扩展或JOIN其他“一对多”表时导致文章记录重复，使用 `DISTINCT` 可以确保返回结果的唯一性。
+        -   5. **排序逻辑**: 结果集首先按 **是否置顶(is_pinned)** 降序排列，然后按 **创建时间(create_time)** 降序排列，以确保置顶和最新的文章优先显示。
+        -   6. **基础条件**: 查询默认会排除所有已被逻辑删除 (`is_deleted = 0`) 的文章。
+    -->
+    <select id="selectPostPage" resultType="com.kmo.kome.dto.response.PostSimpleResponse">
+        SELECT DISTINCT
+            p.id, p.title, p.slug, p.summary, p.cover_image, p.views, p.read_time, p.is_pinned, p.status, p.create_time
+        FROM
+            post p
+            <if test="query.tagId != null">
+                JOIN post_tag pt ON p.id = pt.post_id
+            </if>
+        <where>
+            p.is_deleted = 0
+            <if test="query.keyword != null and query.keyword != ''">
+                AND p.title LIKE CONCAT('%', #{query.keyword}, '%')
+            </if>
+            <if test="query.status != null">
+                AND p.status = #{query.status}
+            </if>
+            <if test="query.tagId != null">
+                AND pt.tag_id = #{query.tagId}
+            </if>
+        </where>
+        ORDER BY
+            p.is_pinned DESC, p.create_time DESC
+    </select>
+</mapper>

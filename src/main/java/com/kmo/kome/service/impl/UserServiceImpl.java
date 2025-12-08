@@ -4,10 +4,10 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.kmo.kome.common.ResultCode;
 import com.kmo.kome.common.exception.ServiceException;
-import com.kmo.kome.dto.request.LoginRequest;
-import com.kmo.kome.dto.request.UpdatePasswordRequest;
-import com.kmo.kome.dto.request.UpdateUserRequest;
-import com.kmo.kome.dto.response.LoginResponse;
+import com.kmo.kome.dto.request.UserLoginRequest;
+import com.kmo.kome.dto.request.UserUpdatePasswordRequest;
+import com.kmo.kome.dto.request.UserUpdateRequest;
+import com.kmo.kome.dto.response.UserLoginResponse;
 import com.kmo.kome.dto.response.UserInfoResponse;
 import com.kmo.kome.entity.User;
 import com.kmo.kome.mapper.UserMapper;
@@ -49,7 +49,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return 登录响应对象
      */
     @Override
-    public LoginResponse login(LoginRequest request) {
+    public UserLoginResponse login(UserLoginRequest request) {
         // 1. 调用 Spring Security 进行认证
         // 该方法会调用 UserDetailsServiceImpl 加载用户，并使用 PasswordEncoder 比对密码
         // 如果认证失败，会抛出 AuthenticationException
@@ -65,7 +65,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String token = jwtUtils.generateToken(user.getId());
 
         // 4. 组装并返回 Response
-        return LoginResponse.builder()
+        return UserLoginResponse.builder()
                 .token(token)
                 .username(user.getUsername())
                 .nickname(user.getNickname())
@@ -104,19 +104,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * 如果用户不存在或更新的用户名已被占用，将抛出相应的业务异常。
      *
      * @param currentUserId 当前用户的 ID，不允许为空。
-     * @param updateUserRequest 包含更新数据的请求对象，可能包括用户名、昵称、头像、邮箱和描述等字段。
+     * @param request 包含更新数据的请求对象，可能包括用户名、昵称、头像、邮箱和描述等字段。
      * @return 更新后的用户信息响应对象 {@code UserInfoResponse}。
      * @throws ServiceException 当用户未登录、用户不存在或用户名已被占用时抛出相应的异常。
      */
     @Override
-    public UserInfoResponse updateUserInfoById(Long currentUserId, UpdateUserRequest updateUserRequest) {
+    public UserInfoResponse updateUserInfoById(Long currentUserId, UserUpdateRequest request) {
         // 前置检查
         User user = checkAndGetUser(currentUserId);
 
         // 检查用户名是否被占用
-        String newUsername = updateUserRequest.getUsername();
+        String newUsername = request.getUsername();
         if(StringUtils.hasText(newUsername) && !newUsername.equals(user.getUsername())){
-            boolean isUsernameTaken = this.lambdaQuery()
+            boolean isUsernameTaken = lambdaQuery()
                     .eq(User::getUsername, newUsername)
                     .ne(User::getId, user.getId())
                     .exists();
@@ -129,15 +129,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User updateUser = new User();
         updateUser.setId(user.getId());
 
-        // 将 updateUserRequest 中的非空属性拷贝到 userToUpdate
-        BeanUtils.copyProperties(updateUserRequest, updateUser);
+        // 将 request 中的非空属性拷贝到 userToUpdate
+        BeanUtils.copyProperties(request, updateUser);
 
         // 执行更新
         // MyBatis Plus 的 updateById 会忽略 userToUpdate 中的 null 字段
-        this.updateById(updateUser);
+        updateById(updateUser);
 
         // 返回更新后的用户信息
-        User updatedUser = this.getById(currentUserId);
+        User updatedUser = getById(currentUserId);
         UserInfoResponse response = new UserInfoResponse();
         BeanUtils.copyProperties(updatedUser, response);
 
@@ -150,28 +150,28 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * 如果验证失败或用户不存在，将抛出相应的业务异常。
      *
      * @param currentUserId 当前执行操作的用户 ID，不能为空，用于标识目标用户。
-     * @param updatePasswordRequest 包含更新密码所需的旧密码和新密码的请求对象，不允许为空。
+     * @param request 包含更新密码所需的旧密码和新密码的请求对象，不允许为空。
      * @throws ServiceException 当用户不存在、旧密码验证失败或新旧密码相同时抛出业务异常。
      */
     @Override
-    public void updateUserPasswordById(Long currentUserId, UpdatePasswordRequest updatePasswordRequest) {
+    public void updateUserPasswordById(Long currentUserId, UserUpdatePasswordRequest request) {
         // 前置检查
         User user = checkAndGetUser(currentUserId);
         // 验证旧密码是否正确
-        if(!passwordEncoder.matches(updatePasswordRequest.getOldPassword(), user.getPassword())){
+        if(!passwordEncoder.matches(request.getOldPassword(), user.getPassword())){
             throw new ServiceException(ResultCode.BAD_REQUEST,"旧密码错误");
         }
 
         // 检查新旧密码是否相同
-        if(updatePasswordRequest.getNewPassword().equals(updatePasswordRequest.getOldPassword())){
+        if(request.getNewPassword().equals(request.getOldPassword())){
             throw new ServiceException(ResultCode.BAD_REQUEST, "新密码不能与旧密码相同");
         }
 
         // 新密码加密
-        String encodePassword = passwordEncoder.encode(updatePasswordRequest.getNewPassword());
+        String encodePassword = passwordEncoder.encode(request.getNewPassword());
 
         // 使用 Wrappers 工厂类，并只更新 password 字段
-        this.update(Wrappers.<User>lambdaUpdate()
+        update(Wrappers.<User>lambdaUpdate()
                 .eq(User::getId, currentUserId)
                 .set(User::getPassword, encodePassword)
         );
@@ -192,7 +192,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
 
         // 检查用户是否存在
-        User user = this.getById(currentUserId);
+        User user = getById(currentUserId);
         if(user == null){
             throw new ServiceException(ResultCode.NOT_FOUND);
         }

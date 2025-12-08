@@ -8,9 +8,9 @@ import lombok.Data;
  * 用于接收前端提交的登录表单数据
  */
 @Data
-public class LoginRequest {
-    @NotBlank
+public class UserLoginRequest {
+    @NotBlank(message = "用户名不能为空")
     private String username;
-    @NotBlank
+    @NotBlank(message = "密码不能为空")
     private String password;
 }

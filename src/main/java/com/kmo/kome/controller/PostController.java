@@ -5,12 +5,15 @@ import com.kmo.kome.common.Result;
 import com.kmo.kome.dto.request.PostCreateRequest;
 import com.kmo.kome.dto.request.PostQueryRequest;
 import com.kmo.kome.dto.request.PostUpdateRequest;
+import com.kmo.kome.dto.response.PostArchiveResponse;
 import com.kmo.kome.dto.response.PostDetailResponse;
 import com.kmo.kome.dto.response.PostSimpleResponse;
 import com.kmo.kome.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -103,5 +106,17 @@ public class PostController {
     @GetMapping("/api/posts")
     public Result<PageResult<PostSimpleResponse>> getPublicPostPage(@Valid PostQueryRequest request){
         return Result.success(postService.getPublicPostPage(request));
+    }
+
+    /**
+     * 获取文章归档列表。
+     * 根据传入的查询条件，返回按年份和月份归档的文章数据，包括每月的文章数量及简单信息。
+     *
+     * @param request 查询文章的请求参数，包含分页信息、关键词、标签筛选及状态筛选等条件。
+     * @return 包含文章归档数据的结果对象 {@code Result<List<PostArchiveResponse>>}。
+     */
+    @GetMapping("/api/posts/archive")
+    public Result<List<PostArchiveResponse>> getArchivePosts(@Valid PostQueryRequest request){
+        return Result.success(postService.getArchivePosts(request));
     }
 }

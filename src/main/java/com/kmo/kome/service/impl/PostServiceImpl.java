@@ -11,6 +11,7 @@ import com.kmo.kome.dto.TagWhitPostIdDTO;
 import com.kmo.kome.dto.request.PostCreateRequest;
 import com.kmo.kome.dto.request.PostQueryRequest;
 import com.kmo.kome.dto.request.PostUpdateRequest;
+import com.kmo.kome.dto.response.PostArchiveResponse;
 import com.kmo.kome.dto.response.PostDetailResponse;
 import com.kmo.kome.dto.response.PostSimpleResponse;
 import com.kmo.kome.dto.response.TagResponse;
@@ -207,6 +208,80 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
     }
 
     /**
+     * 获取文章归档信息。
+     * 该方法按年份和月份对已发布的文章进行归档，返回按时间分组的文章数据。
+     *
+     * @param request 文章查询请求对象，用于定义筛选条件，包括关键字、标签等过滤条件。
+     *                该方法内部会自动设置状态为已发布（status=1）并查询全部数据（pageSize=-1）。
+     * @return 包含按年份和月份分组的文章归档列表。在没有符合条件的文章时，返回空列表。
+     */
+    @Override
+    public List<PostArchiveResponse> getArchivePosts(PostQueryRequest request) {
+        // 准备查询参数
+        request.setStatus(1); // 只查询已发布文章（status=1）
+        request.setPageSize(-1); // 查询全部数据（pageSize=-1，避免分页）
+        // 获取原始数据, 并按照创建时间倒叙排序
+        List<PostSimpleResponse> rawPosts = getAdminPostPage(request).getRecords().stream()
+                .sorted(Comparator.comparing(PostSimpleResponse::getCoverImage).reversed())
+                .toList();
+        // 空数据直接返回空列表
+        if(CollectionUtils.isEmpty(rawPosts)){
+            return Collections.emptyList();
+        }
+
+        return rawPosts.stream()
+                .collect(Collectors.groupingBy(
+                        post -> post.getCreateTime().getYear(), // 提取年份
+                        LinkedHashMap::new, // 保序Map：年份降序插入
+                        Collectors.groupingBy(
+                                post -> post.getCreateTime().getMonthValue(), // 提取月份
+                                LinkedHashMap::new, // 保序Map：月份降序插入
+                                Collectors.mapping(this::convertToArchiveSimplePost, Collectors.toList()) // 大对象转换成小对象
+                        )
+                )).entrySet().stream()
+                .map(yearEntry -> {
+                    Integer year = yearEntry.getKey();
+                    Map<Integer, List<PostArchiveResponse.ArchiveSimplePost>> monthMap = yearEntry.getValue();
+
+                    // 构建月份
+                    List<PostArchiveResponse.MonthGroup> months = monthMap.entrySet().stream()
+                            .map(monthEntry -> PostArchiveResponse.MonthGroup.builder()
+                                    .month(monthEntry.getKey())
+                                    .posts(monthEntry.getValue())
+                                    .total(monthEntry.getValue().size())
+                                    .build())
+                            .toList();
+                    // 计算年 total
+                    int yearTotal = months.stream().mapToInt(PostArchiveResponse.MonthGroup::getTotal).sum();
+                    // 构建年份
+                    return PostArchiveResponse.builder()
+                            .year(year)
+                            .months(months)
+                            .total(yearTotal)
+                            .build();
+                } )
+                .toList();
+    }
+
+    /**
+     * 将文章概要响应对象转换为文章归档的简单文章对象。
+     * 该方法用于构建归档数据时，将文章的基本信息封装为归档所需格式。
+     *
+     * @param origin 文章概要响应对象，包含文章的 ID、标题、别名（Slug）、标签和创建时间等基本信息。
+     *               不能为 null，且需确保其字段值已被正确初始化。
+     * @return 归档用的简单文章对象，包含文章的 ID、标题、别名（Slug）、标签和创建时间等信息。
+     */
+    private PostArchiveResponse.ArchiveSimplePost convertToArchiveSimplePost(PostSimpleResponse origin){
+        return PostArchiveResponse.ArchiveSimplePost.builder()
+                .id(origin.getId())
+                .title(origin.getTitle())
+                .slug(origin.getSlug())
+                .tags(origin.getTags())
+                .createTime(origin.getCreateTime())
+                .build();
+    }
+
+    /**
      * 获取后台管理文章分页列表。
      * 根据提供的查询条件和分页参数，查询符合条件的文章主列表及其关联的标签信息，
      * 并返回封装完成的分页结果。
@@ -218,6 +293,10 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
     public PageResult<PostSimpleResponse> getAdminPostPage(PostQueryRequest request) {
         // 分页查询文章主列表
         Page<PostSimpleResponse> pageRequest = new Page<>(request.getPageNum(), request.getPageSize());
+        // 如果是 archive 接口调用，怎不分页也不查询 count
+        if(pageRequest.getSize() == -1){
+            pageRequest.setSearchCount(false);
+        }
         Page<PostSimpleResponse> postPage = baseMapper.selectPostPage(pageRequest, request);
 
         List<PostSimpleResponse> posts = postPage.getRecords();

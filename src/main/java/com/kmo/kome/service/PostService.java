@@ -5,10 +5,13 @@ import com.kmo.kome.common.PageResult;
 import com.kmo.kome.dto.request.PostCreateRequest;
 import com.kmo.kome.dto.request.PostQueryRequest;
 import com.kmo.kome.dto.request.PostUpdateRequest;
+import com.kmo.kome.dto.response.PostArchiveResponse;
 import com.kmo.kome.dto.response.PostDetailResponse;
 import com.kmo.kome.dto.response.PostSimpleResponse;
 import com.kmo.kome.entity.Post;
 import jakarta.validation.Valid;
+
+import java.util.List;
 
 /**
  * 博客文章业务接口
@@ -30,5 +33,7 @@ public interface PostService extends IService<Post> {
     PageResult<PostSimpleResponse> getAdminPostPage(@Valid PostQueryRequest request);
 
     PageResult<PostSimpleResponse> getPublicPostPage(@Valid PostQueryRequest request);
+
+    List<PostArchiveResponse> getArchivePosts(@Valid PostQueryRequest request);
 }
 

@@ -86,6 +86,35 @@ public class MemoServiceImpl extends ServiceImpl<MemoMapper, Memo> implements Me
     }
 
     /**
+     * 获取最新的备忘录列表。
+     * 根据指定的限制数量，查询并返回已发布的最新备忘录记录，按创建时间倒序排列。
+     * 如果参数为空或超过限制范围，将使用默认值。
+     *
+     * @param limit 最大返回记录的数量，允许值范围为 1 至 4，如果为空或无效，默认值为 2
+     * @return 包含最新备忘录的 MemoResponse 对象列表
+     */
+    @Override
+    public List<MemoResponse> getLatestMemo(Integer limit) {
+        // 设置默认限制数量
+        final int DEFAULT_LIMIT = 2;
+        if(limit == null || limit <= 0 || limit > 4){
+            limit = DEFAULT_LIMIT;
+        }
+
+        // 查询列表，只查询已发布，按创建时间倒叙，限制数量
+        List<Memo> memos = list(new LambdaQueryWrapper<Memo>()
+                .eq(Memo::getStatus, 1)
+                .orderByDesc(Memo::getCreateTime)
+                .last("LIMIT " + limit)
+        );
+
+        // 转换并返回数据
+        return memos.stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    /**
      * 获取公共备忘录分页列表。
      * 根据传入的查询请求，设置状态为公开状态（1），并调用后台管理查询方法获取分页结果。
      *

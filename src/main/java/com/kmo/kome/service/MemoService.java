@@ -9,6 +9,8 @@ import com.kmo.kome.dto.response.MemoResponse;
 import com.kmo.kome.entity.Memo;
 import jakarta.validation.Valid;
 
+import java.util.List;
+
 /**
  * 备忘录业务接口
  * <p>
@@ -25,4 +27,6 @@ public interface MemoService extends IService<Memo> {
     Void updateMemoById(Long id, @Valid MemoUpdateRequest request);
 
     Void deleteMemoById(Long id);
+
+    List<MemoResponse> getLatestMemo(Integer limit);
 }

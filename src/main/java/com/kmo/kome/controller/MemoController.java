@@ -11,6 +11,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 public class MemoController {
@@ -78,5 +80,17 @@ public class MemoController {
     @GetMapping("/api/admin/memos")
     public Result<PageResult<MemoResponse>> getAdminMemoPage(@Valid MemoQueryRequest request){
         return Result.success(memoService.getAdminMemoPage(request));
+    }
+
+    /**
+     * 获取最新的备忘录列表。
+     * 调用服务层方法，根据指定的数量限制查询最近创建的备忘录，并返回结果。
+     *
+     * @param limit 查询的备忘录数量限制。如果未指定，默认为 2。
+     * @return 包含最新备忘录列表的结果对象，其数据类型为 {@code Result<List<MemoResponse>>}。
+     */
+    @GetMapping("/api/memos/latest")
+    public Result<List<MemoResponse>> getLatestMemo(@RequestParam(value = "limit", defaultValue = "2") Integer limit){
+        return Result.success(memoService.getLatestMemo(limit));
     }
 }

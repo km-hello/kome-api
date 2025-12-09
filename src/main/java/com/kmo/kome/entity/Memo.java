@@ -9,9 +9,9 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
- * 备忘录实体类
+ *  Memo 实体类
  * 对应数据库表: memo
- * 用于存储和管理备忘录的相关信息
+ * 用于存储和管理 Memo 的相关信息
  */
 @Data
 @TableName("memo")

@@ -12,10 +12,10 @@ import jakarta.validation.Valid;
 import java.util.List;
 
 /**
- * 备忘录业务接口
+ *  Memo 业务接口
  * <p>
- * 继承自 IService<Memo>，提供与备忘录相关的基础 CRUD 操作能力。
- * 主要用于处理备忘录的数据管理和相关业务逻辑。
+ * 继承自 IService<Memo>，提供与 Memo 相关的基础 CRUD 操作能力。
+ * 主要用于处理 Memo 的数据管理和相关业务逻辑。
  */
 public interface MemoService extends IService<Memo> {
     PageResult<MemoResponse> getAdminMemoPage(@Valid MemoQueryRequest request);

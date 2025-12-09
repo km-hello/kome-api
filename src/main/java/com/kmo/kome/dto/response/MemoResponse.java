@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * 备忘录响应 DTO 类。
- * 用于封装备忘录的相关信息并返回给前端。
- * 通常在备忘录管理相关的接口中使用。
+ *  Memo 响应 DTO 类。
+ * 用于封装 Memo 的相关信息并返回给前端。
+ * 通常在 Memo 管理相关的接口中使用。
  */
 @Data
 @Builder

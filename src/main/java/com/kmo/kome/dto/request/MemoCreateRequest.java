@@ -4,9 +4,9 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 /**
- * 创建备忘录请求类。
- * 用于封装创建新备忘录时提交的数据。
- * 包括备忘录内容、是否置顶以及状态字段。
+ * 创建 Memo 请求类。
+ * 用于封装创建新 Memo 时提交的数据。
+ * 包括 Memo 内容、是否置顶以及状态字段。
  */
 @Data
 public class MemoCreateRequest {

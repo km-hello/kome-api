@@ -20,11 +20,11 @@ public class MemoController {
     private final MemoService memoService;
 
     /**
-     * 创建备忘录。
-     * 接收备忘录创建请求对象，调用服务层方法生成新的备忘录，并返回新备忘录的 ID。
+     * 创建 Memo 。
+     * 接收 Memo 创建请求对象，调用服务层方法生成新的 Memo ，并返回新 Memo 的 ID。
      *
-     * @param request 备忘录创建请求对象，包含备忘录的内容、是否置顶以及状态信息。
-     * @return 包含新建备忘录 ID 的结果对象。
+     * @param request  Memo 创建请求对象，包含 Memo 的内容、是否置顶以及状态信息。
+     * @return 包含新建 Memo  ID 的结果对象。
      */
     @PostMapping("/api/admin/memos")
     public Result<Long> createMemo(@Valid @RequestBody MemoCreateRequest request){
@@ -32,11 +32,11 @@ public class MemoController {
     }
 
     /**
-     * 更新指定 ID 的备忘录。
-     * 接收备忘录 ID 和更新请求对象，调用服务层方法更新备忘录内容，并返回操作结果。
+     * 更新指定 ID 的 Memo 。
+     * 接收 Memo  ID 和更新请求对象，调用服务层方法更新 Memo 内容，并返回操作结果。
      *
-     * @param id 要更新的备忘录 ID。
-     * @param request 备忘录更新请求对象，包含更新后的内容、是否置顶和状态信息。
+     * @param id 要更新的 Memo  ID。
+     * @param request  Memo 更新请求对象，包含更新后的内容、是否置顶和状态信息。
      * @return 一个空的 {@code Result<Void>} 对象，表示更新操作的结果。
      */
     @PutMapping("/api/admin/memos/{id}")
@@ -45,10 +45,10 @@ public class MemoController {
     }
 
     /**
-     * 根据指定的备忘录 ID 删除备忘录。
+     * 根据指定的 Memo  ID 删除 Memo 。
      * 调用服务层方法执行删除操作，并返回删除操作的结果。
      *
-     * @param id 要删除的备忘录 ID。
+     * @param id 要删除的 Memo  ID。
      * @return 一个空的 {@code Result<Void>} 对象，表示删除操作的结果。
      */
     @DeleteMapping("/api/admin/memos/{id}")
@@ -58,11 +58,11 @@ public class MemoController {
 
 
     /**
-     * 查询公开的备忘录分页列表。
-     * 根据请求参数筛选符合条件的备忘录，返回分页结果。
+     * 查询公开的 Memo 分页列表。
+     * 根据请求参数筛选符合条件的 Memo ，返回分页结果。
      *
      * @param request 包含分页参数（页码、每页记录数）及筛选条件（关键词、状态）的查询请求对象。
-     * @return 包含公开备忘录分页数据的结果对象，数据类型为 {@code Result<PageResult<MemoResponse>>}。
+     * @return 包含公开 Memo 分页数据的结果对象，数据类型为 {@code Result<PageResult<MemoResponse>>}。
      */
     @GetMapping("/api/memos")
     public Result<PageResult<MemoResponse>> getPublicMemoPage(@Valid MemoQueryRequest request){
@@ -71,11 +71,11 @@ public class MemoController {
 
 
     /**
-     * 查询管理员的备忘录分页列表。
-     * 根据请求参数筛选符合条件的备忘录，返回分页结果。
+     * 查询管理员的 Memo 分页列表。
+     * 根据请求参数筛选符合条件的 Memo ，返回分页结果。
      *
      * @param request 包含分页参数（页码、每页记录数）及筛选条件（关键词、状态）的查询请求对象。
-     * @return 包含备忘录分页数据的结果对象，数据类型为 {@code Result<PageResult<MemoResponse>>}。
+     * @return 包含 Memo 分页数据的结果对象，数据类型为 {@code Result<PageResult<MemoResponse>>}。
      */
     @GetMapping("/api/admin/memos")
     public Result<PageResult<MemoResponse>> getAdminMemoPage(@Valid MemoQueryRequest request){
@@ -83,11 +83,11 @@ public class MemoController {
     }
 
     /**
-     * 获取最新的备忘录列表。
-     * 调用服务层方法，根据指定的数量限制查询最近创建的备忘录，并返回结果。
+     * 获取最新的 Memo 列表。
+     * 调用服务层方法，根据指定的数量限制查询最近创建的 Memo ，并返回结果。
      *
-     * @param limit 查询的备忘录数量限制。如果未指定，默认为 2。
-     * @return 包含最新备忘录列表的结果对象，其数据类型为 {@code Result<List<MemoResponse>>}。
+     * @param limit 查询的 Memo 数量限制。如果未指定，默认为 2。
+     * @return 包含最新 Memo 列表的结果对象，其数据类型为 {@code Result<List<MemoResponse>>}。
      */
     @GetMapping("/api/memos/latest")
     public Result<List<MemoResponse>> getLatestMemo(@RequestParam(value = "limit", defaultValue = "2") Integer limit){

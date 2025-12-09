@@ -4,8 +4,8 @@ import jakarta.validation.constraints.Min;
 import lombok.Data;
 
 /**
- * 备忘录查询请求类。
- * 用于封装查询备忘录列表时的筛选条件和分页信息。
+ *  Memo 查询请求类。
+ * 用于封装查询 Memo 列表时的筛选条件和分页信息。
  * 支持通过关键词和状态进行筛选，同时具备分页功能。
  */
 @Data

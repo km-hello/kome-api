@@ -20,19 +20,19 @@ import org.springframework.util.StringUtils;
 import java.util.List;
 
 /**
- * 备忘录服务实现类
+ *  Memo 服务实现类
  * <p>
  * 继承自 ServiceImpl<MemoMapper, Memo>，实现了 MemoService 接口。
- * 提供了与备忘录相关的业务逻辑和数据操作，并通过继承父类实现了基础的 CRUD 功能。
+ * 提供了与 Memo 相关的业务逻辑和数据操作，并通过继承父类实现了基础的 CRUD 功能。
  */
 @Service
 public class MemoServiceImpl extends ServiceImpl<MemoMapper, Memo> implements MemoService {
 
     /**
-     * 创建一条新的备忘录记录。
-     * 根据传入的创建请求对象，将其属性值复制到备忘录实体中并保存到数据库。
+     * 创建一条新的 Memo 记录。
+     * 根据传入的创建请求对象，将其属性值复制到 Memo 实体中并保存到数据库。
      *
-     * @param request 包含备忘录相关创建数据的请求对象，包括内容、是否置顶以及状态。
+     * @param request 包含 Memo 相关创建数据的请求对象，包括内容、是否置顶以及状态。
      * @return 返回值固定为 null。
      */
     @Override
@@ -44,14 +44,14 @@ public class MemoServiceImpl extends ServiceImpl<MemoMapper, Memo> implements Me
     }
 
     /**
-     * 根据指定的备忘录 ID 更新备忘录信息。
-     * 首先根据 ID 查询对应的备忘录记录，如记录不存在，则抛出业务异常；
-     * 然后将请求对象中的更新信息复制到目标备忘录对象，并通过 ID 执行更新操作。
+     * 根据指定的 Memo  ID 更新 Memo 信息。
+     * 首先根据 ID 查询对应的 Memo 记录，如记录不存在，则抛出业务异常；
+     * 然后将请求对象中的更新信息复制到目标 Memo 对象，并通过 ID 执行更新操作。
      *
-     * @param id 备忘录的唯一标识符，用于指定待更新的记录
-     * @param request 包含更新内容的请求对象，包含备忘录的内容、是否置顶以及状态字段
+     * @param id  Memo 的唯一标识符，用于指定待更新的记录
+     * @param request 包含更新内容的请求对象，包含 Memo 的内容、是否置顶以及状态字段
      * @return 更新操作的返回值，固定为 null
-     * @throws ServiceException 当指定的备忘录记录不存在时，抛出此异常
+     * @throws ServiceException 当指定的 Memo 记录不存在时，抛出此异常
      */
     @Override
     public Void updateMemoById(Long id, MemoUpdateRequest request) {
@@ -67,13 +67,13 @@ public class MemoServiceImpl extends ServiceImpl<MemoMapper, Memo> implements Me
     }
 
     /**
-     * 根据指定的备忘录 ID 删除备忘录记录。
-     * 首先根据 ID 查询对应的备忘录记录，如记录不存在时将抛出业务异常；
+     * 根据指定的 Memo  ID 删除 Memo 记录。
+     * 首先根据 ID 查询对应的 Memo 记录，如记录不存在时将抛出业务异常；
      * 若记录存在，则执行删除操作。
      *
-     * @param id 备忘录的唯一标识符，用于指定待删除的记录
+     * @param id  Memo 的唯一标识符，用于指定待删除的记录
      * @return 返回值固定为 null
-     * @throws ServiceException 当指定的备忘录记录不存在时抛出此异常
+     * @throws ServiceException 当指定的 Memo 记录不存在时抛出此异常
      */
     @Override
     public Void deleteMemoById(Long id) {
@@ -86,12 +86,12 @@ public class MemoServiceImpl extends ServiceImpl<MemoMapper, Memo> implements Me
     }
 
     /**
-     * 获取最新的备忘录列表。
-     * 根据指定的限制数量，查询并返回已发布的最新备忘录记录，按创建时间倒序排列。
+     * 获取最新的 Memo 列表。
+     * 根据指定的限制数量，查询并返回已发布的最新 Memo 记录，按创建时间倒序排列。
      * 如果参数为空或超过限制范围，将使用默认值。
      *
      * @param limit 最大返回记录的数量，允许值范围为 1 至 4，如果为空或无效，默认值为 2
-     * @return 包含最新备忘录的 MemoResponse 对象列表
+     * @return 包含最新 Memo 的 MemoResponse 对象列表
      */
     @Override
     public List<MemoResponse> getLatestMemo(Integer limit) {
@@ -115,7 +115,7 @@ public class MemoServiceImpl extends ServiceImpl<MemoMapper, Memo> implements Me
     }
 
     /**
-     * 获取公共备忘录分页列表。
+     * 获取公共 Memo 分页列表。
      * 根据传入的查询请求，设置状态为公开状态（1），并调用后台管理查询方法获取分页结果。
      *
      * @param request 包含分页查询条件的请求对象，须包含页码和每页数量，可选关键词。
@@ -129,7 +129,7 @@ public class MemoServiceImpl extends ServiceImpl<MemoMapper, Memo> implements Me
     }
 
     /**
-     * 获取备忘录分页列表，提供用于后台管理的分页查询功能。
+     * 获取 Memo 分页列表，提供用于后台管理的分页查询功能。
      * 根据请求参数，包括关键词、状态、页码和每页数量，动态构建查询条件，
      * 并返回包含分页数据的结果对象。
      *

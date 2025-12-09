@@ -1,5 +1,6 @@
 package com.kmo.kome.dto.request;
 
+import jakarta.validation.constraints.Min;
 import lombok.Data;
 
 
@@ -10,5 +11,12 @@ import lombok.Data;
  */
 @Data
 public class LinkQueryRequest {
+    @Min(value = 1, message = "页码最小为1")
+    private Integer pageNum = 1;
+
+    @Min(value = 1, message = "每页数量最少为1")
+    private Integer pageSize = 10;
+
+    // 关键词筛选
     private String keyword;
 }

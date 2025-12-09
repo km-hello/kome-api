@@ -26,6 +26,8 @@ public class User {
     private String email;
     private String description;
 
+    // 是否为站点所有者: 1=是，0=否, 默认 0
+    private Boolean isOwner;
     // 逻辑删除字段 (MyBatis Plus会自动处理)
     @TableLogic
     private Boolean isDeleted;

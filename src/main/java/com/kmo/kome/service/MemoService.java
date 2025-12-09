@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.kmo.kome.common.PageResult;
 import com.kmo.kome.dto.request.MemoCreateRequest;
 import com.kmo.kome.dto.request.MemoQueryRequest;
+import com.kmo.kome.dto.request.MemoUpdateRequest;
 import com.kmo.kome.dto.response.MemoResponse;
 import com.kmo.kome.entity.Memo;
 import jakarta.validation.Valid;
@@ -20,4 +21,6 @@ public interface MemoService extends IService<Memo> {
     PageResult<MemoResponse> getPublicMemoPage(@Valid MemoQueryRequest request);
 
     Long createMemo(@Valid MemoCreateRequest request);
+
+    Void updateMemoById(Long id, @Valid MemoUpdateRequest request);
 }

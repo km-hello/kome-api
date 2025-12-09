@@ -4,14 +4,12 @@ import com.kmo.kome.common.PageResult;
 import com.kmo.kome.common.Result;
 import com.kmo.kome.dto.request.MemoCreateRequest;
 import com.kmo.kome.dto.request.MemoQueryRequest;
+import com.kmo.kome.dto.request.MemoUpdateRequest;
 import com.kmo.kome.dto.response.MemoResponse;
 import com.kmo.kome.service.MemoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,6 +27,19 @@ public class MemoController {
     @PostMapping("/api/admin/memos")
     public Result<Long> createMemo(@Valid @RequestBody MemoCreateRequest request){
         return Result.success(memoService.createMemo(request));
+    }
+
+    /**
+     * 更新指定 ID 的备忘录。
+     * 接收备忘录 ID 和更新请求对象，调用服务层方法更新备忘录内容，并返回操作结果。
+     *
+     * @param id 要更新的备忘录 ID。
+     * @param request 备忘录更新请求对象，包含更新后的内容、是否置顶和状态信息。
+     * @return 一个空的 {@code Result<Void>} 对象，表示更新操作的结果。
+     */
+    @PutMapping("/api/admin/memos/{id}")
+    public Result<Void> updateMemoById(@PathVariable Long id,@Valid @RequestBody MemoUpdateRequest request){
+        return Result.success(memoService.updateMemoById(id, request));
     }
 
 

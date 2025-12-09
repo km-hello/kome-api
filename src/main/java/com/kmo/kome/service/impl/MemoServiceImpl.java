@@ -4,8 +4,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.kmo.kome.common.PageResult;
+import com.kmo.kome.common.ResultCode;
+import com.kmo.kome.common.exception.ServiceException;
 import com.kmo.kome.dto.request.MemoCreateRequest;
 import com.kmo.kome.dto.request.MemoQueryRequest;
+import com.kmo.kome.dto.request.MemoUpdateRequest;
 import com.kmo.kome.dto.response.MemoResponse;
 import com.kmo.kome.entity.Memo;
 import com.kmo.kome.mapper.MemoMapper;
@@ -38,6 +41,29 @@ public class MemoServiceImpl extends ServiceImpl<MemoMapper, Memo> implements Me
         BeanUtils.copyProperties(request, memo);
         save(memo);
         return memo.getId();
+    }
+
+    /**
+     * 根据指定的备忘录 ID 更新备忘录信息。
+     * 首先根据 ID 查询对应的备忘录记录，如记录不存在，则抛出业务异常；
+     * 然后将请求对象中的更新信息复制到目标备忘录对象，并通过 ID 执行更新操作。
+     *
+     * @param id 备忘录的唯一标识符，用于指定待更新的记录
+     * @param request 包含更新内容的请求对象，包含备忘录的内容、是否置顶以及状态字段
+     * @return 更新操作的返回值，固定为 null
+     * @throws ServiceException 当指定的备忘录记录不存在时，抛出此异常
+     */
+    @Override
+    public Void updateMemoById(Long id, MemoUpdateRequest request) {
+        Memo memo = getById(id);
+        if(memo == null){
+            throw new ServiceException(ResultCode.NOT_FOUND);
+        }
+        Memo updateMemo = new Memo();
+        BeanUtils.copyProperties(request, updateMemo);
+        updateMemo.setId(id);
+        updateById(updateMemo);
+        return null;
     }
 
     /**

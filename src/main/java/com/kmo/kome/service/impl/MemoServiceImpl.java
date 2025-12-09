@@ -67,6 +67,25 @@ public class MemoServiceImpl extends ServiceImpl<MemoMapper, Memo> implements Me
     }
 
     /**
+     * 根据指定的备忘录 ID 删除备忘录记录。
+     * 首先根据 ID 查询对应的备忘录记录，如记录不存在时将抛出业务异常；
+     * 若记录存在，则执行删除操作。
+     *
+     * @param id 备忘录的唯一标识符，用于指定待删除的记录
+     * @return 返回值固定为 null
+     * @throws ServiceException 当指定的备忘录记录不存在时抛出此异常
+     */
+    @Override
+    public Void deleteMemoById(Long id) {
+        Memo memo = getById(id);
+        if(memo == null){
+            throw new ServiceException(ResultCode.NOT_FOUND);
+        }
+        removeById(id);
+        return null;
+    }
+
+    /**
      * 获取公共备忘录分页列表。
      * 根据传入的查询请求，设置状态为公开状态（1），并调用后台管理查询方法获取分页结果。
      *

@@ -42,6 +42,18 @@ public class MemoController {
         return Result.success(memoService.updateMemoById(id, request));
     }
 
+    /**
+     * 根据指定的备忘录 ID 删除备忘录。
+     * 调用服务层方法执行删除操作，并返回删除操作的结果。
+     *
+     * @param id 要删除的备忘录 ID。
+     * @return 一个空的 {@code Result<Void>} 对象，表示删除操作的结果。
+     */
+    @DeleteMapping("/api/admin/memos/{id}")
+    public Result<Void> deleteMemoById(@PathVariable Long id){
+        return Result.success(memoService.deleteMemoById(id));
+    }
+
 
     /**
      * 查询公开的备忘录分页列表。

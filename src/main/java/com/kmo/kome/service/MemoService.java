@@ -23,4 +23,6 @@ public interface MemoService extends IService<Memo> {
     Long createMemo(@Valid MemoCreateRequest request);
 
     Void updateMemoById(Long id, @Valid MemoUpdateRequest request);
+
+    Void deleteMemoById(Long id);
 }

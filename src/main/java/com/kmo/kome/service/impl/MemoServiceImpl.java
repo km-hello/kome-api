@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.kmo.kome.common.PageResult;
+import com.kmo.kome.dto.request.MemoCreateRequest;
 import com.kmo.kome.dto.request.MemoQueryRequest;
 import com.kmo.kome.dto.response.MemoResponse;
 import com.kmo.kome.entity.Memo;
@@ -23,6 +24,35 @@ import java.util.List;
  */
 @Service
 public class MemoServiceImpl extends ServiceImpl<MemoMapper, Memo> implements MemoService {
+
+    /**
+     * 创建一条新的备忘录记录。
+     * 根据传入的创建请求对象，将其属性值复制到备忘录实体中并保存到数据库。
+     *
+     * @param request 包含备忘录相关创建数据的请求对象，包括内容、是否置顶以及状态。
+     * @return 返回值固定为 null。
+     */
+    @Override
+    public Long createMemo(MemoCreateRequest request) {
+        Memo memo = new Memo();
+        BeanUtils.copyProperties(request, memo);
+        save(memo);
+        return memo.getId();
+    }
+
+    /**
+     * 获取公共备忘录分页列表。
+     * 根据传入的查询请求，设置状态为公开状态（1），并调用后台管理查询方法获取分页结果。
+     *
+     * @param request 包含分页查询条件的请求对象，须包含页码和每页数量，可选关键词。
+     * @return 包含查询结果的分页对象，记录列表为 MemoResponse 类型。
+     */
+    @Override
+    public PageResult<MemoResponse> getPublicMemoPage(MemoQueryRequest request) {
+        // 仅查询已发布的
+        request.setStatus(1);
+        return getAdminMemoPage(request);
+    }
 
     /**
      * 获取备忘录分页列表，提供用于后台管理的分页查询功能。

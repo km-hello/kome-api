@@ -35,7 +35,7 @@ CREATE TABLE `post` (
   `cover_image` varchar(255) DEFAULT NULL COMMENT '封面图URL',
   `views` int unsigned NOT NULL DEFAULT '0' COMMENT '阅读量',
   `read_time` int unsigned NOT NULL DEFAULT '0' COMMENT '阅读耗时(分钟)',
-  `is_pinned` tinyint NOT NULL DEFAULT '0' COMMENT '是否置顶: 0=否，1=是',
+  `is_pinned` tinyint NOT NULL DEFAULT '0' COMMENT '是否置顶: 0=否, 1=是',
   `status` tinyint NOT NULL DEFAULT '0' COMMENT '状态: 0=草稿, 1=已发布',
   `is_deleted` tinyint NOT NULL DEFAULT '0' COMMENT '逻辑删除: 0=正常, 1=已删除',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',

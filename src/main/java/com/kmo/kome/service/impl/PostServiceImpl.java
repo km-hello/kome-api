@@ -96,7 +96,14 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
                         .eq(PostTag::getPostId, id)
         );
 
-        // 删除文章
+        // 为了释放唯一索引，修改slug
+        String newSlug = post.getSlug() + "_del_" + System.currentTimeMillis();
+        post.setSlug(newSlug);
+
+        // 更新 slug
+        updateById(post);
+
+        // 执行逻辑删除
         removeById(id);
         return null;
     }

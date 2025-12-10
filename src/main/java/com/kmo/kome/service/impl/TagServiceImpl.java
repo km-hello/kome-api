@@ -71,7 +71,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
         // 检查标签是否存在
         Tag oldTag = getById(id);
         if (oldTag == null) {
-            throw new ServiceException(ResultCode.NOT_FOUND);
+            throw new ServiceException(ResultCode.NOT_FOUND, "标签不存在");
         }
 
         // 检查新标签名是否被占用
@@ -107,7 +107,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
         // 检查标签是否存在
         Tag tag = getById(id);
         if (tag == null) {
-            throw new ServiceException(ResultCode.NOT_FOUND);
+            throw new ServiceException(ResultCode.NOT_FOUND, "标签不存在");
         }
 
         // 检查标签是否在使用中

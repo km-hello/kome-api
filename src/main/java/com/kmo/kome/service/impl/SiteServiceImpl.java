@@ -47,7 +47,7 @@ public class SiteServiceImpl implements SiteService {
                 .last("LIMIT 1")
         );
         if(user == null){
-            throw new ServiceException(ResultCode.NOT_FOUND);
+            throw new ServiceException(ResultCode.INTERNAL_SERVER_ERROR, "系统数据缺失");
         }
 
         SiteInfoResponse.OwnerInfo ownerInfo = SiteInfoResponse.OwnerInfo.builder()

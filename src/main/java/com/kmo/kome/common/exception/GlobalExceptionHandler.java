@@ -55,8 +55,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<Result<?>> handleNoResourceFoundException(NoResourceFoundException e){
-        log.warn("无静态资源: {}", e.getMessage());
-        Result<?> result = Result.fail(ResultCode.NOT_FOUND);
+        log.warn("资源不存在: {}", e.getMessage());
+        Result<?> result = Result.fail(ResultCode.NOT_FOUND, "资源不存在");
         return new ResponseEntity<>(result, HttpStatus.NOT_FOUND);
     }
 
@@ -70,7 +70,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({HttpRequestMethodNotSupportedException.class})
     public ResponseEntity<Result<?>> handleHttpRequestMethodNotSupported (HttpRequestMethodNotSupportedException e){
         log.warn("不支持的请求方法：{}", e.getMethod());
-        Result<?> result = Result.fail(ResultCode.METHOD_NOT_ALLOWED);
+        Result<?> result = Result.fail(ResultCode.METHOD_NOT_ALLOWED, "请求方法不支持");
         return new ResponseEntity<>(result, HttpStatus.METHOD_NOT_ALLOWED);
     }
 
@@ -84,7 +84,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({BadCredentialsException.class, UsernameNotFoundException.class, InternalAuthenticationServiceException.class})
     public ResponseEntity<Result<?>> handleAuthenticationException(Exception e){
         log.warn("登录失败: {}", e.getMessage());
-        Result<?> result = Result.fail(ResultCode.UNAUTHORIZED);
+        Result<?> result = Result.fail(ResultCode.UNAUTHORIZED, "用户名或密码错误");
         return new ResponseEntity<>(result, HttpStatus.UNAUTHORIZED);
     }
 
@@ -99,7 +99,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Result<?>> handleHttpMessageNotReadableException(HttpMessageNotReadableException e){
         log.warn("JSON解析失败: {}", e.getMessage());
-        Result<?> result = Result.fail(ResultCode.BAD_REQUEST);
+        Result<?> result = Result.fail(ResultCode.BAD_REQUEST, "请求参数格式错误");
         return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
     }
 
@@ -138,7 +138,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Result<?>> handleAccessDeniedException(AccessDeniedException e){
         log.warn("权限不足: {}", e.getMessage());
-        Result<?> result = Result.fail(ResultCode.FORBIDDEN);
+        Result<?> result = Result.fail(ResultCode.FORBIDDEN, "无访问权限");
         return new ResponseEntity<>(result, HttpStatus.FORBIDDEN);
     }
 
@@ -152,7 +152,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Result<?>> handleException(Exception e){
         log.error("系统异常: ", e); // 打印堆栈信息以便排查
-        Result<?> result = Result.fail(ResultCode.INTERNAL_SERVER_ERROR);
+        Result<?> result = Result.fail(ResultCode.INTERNAL_SERVER_ERROR, "系统繁忙，请稍后重试");
         return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

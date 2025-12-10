@@ -87,7 +87,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
         // 检查 post 是否存在
         Post post = getById(id);
         if(post == null){
-            throw new ServiceException(ResultCode.NOT_FOUND, "未找到该文章");
+            throw new ServiceException(ResultCode.NOT_FOUND, "文章不存在");
         }
 
         // 删除 post_tag 关联表中的相关记录
@@ -124,7 +124,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
         // 检查文章是否存在
         Post oldPost = getById(id);
         if(oldPost == null){
-            throw new ServiceException(ResultCode.NOT_FOUND);
+            throw new ServiceException(ResultCode.NOT_FOUND, "文章不存在");
         }
 
         // 检查别名是否被占用
@@ -160,7 +160,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
         // 根据 id 查询文章
         Post post = getById(id);
         if(post == null){
-            throw new ServiceException(ResultCode.NOT_FOUND);
+            throw new ServiceException(ResultCode.NOT_FOUND, "文章不存在");
         }
 
         // 后台接口不增加阅读量

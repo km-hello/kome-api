@@ -16,7 +16,7 @@ import java.io.IOException;
  * 处理访问被拒绝的情况的处理器实现类。
  * 当用户尝试访问其无权限的资源时，将向客户端返回一个标准的 JSON 格式的响应，
  * 内容包含状态码和提示信息，状态码为 403。
- *
+ * <p>
  * 此类实现了 Spring Security 提供的 AccessDeniedHandler 接口，
  * 用于统一处理权限不足所引发的异常。
  */
@@ -38,7 +38,7 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
 
-        Result<Object> result = Result.fail(ResultCode.FORBIDDEN);
+        Result<Object> result = Result.fail(ResultCode.FORBIDDEN, "无访问权限");
 
         response.getWriter().write(new ObjectMapper().writeValueAsString(result));
     }

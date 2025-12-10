@@ -5,6 +5,7 @@ import com.kmo.kome.common.ResultCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -85,6 +86,21 @@ public class GlobalExceptionHandler {
         log.warn("登录失败: {}", e.getMessage());
         Result<?> result = Result.fail(ResultCode.UNAUTHORIZED);
         return new ResponseEntity<>(result, HttpStatus.UNAUTHORIZED);
+    }
+
+    /**
+     * 处理 {@code HttpMessageNotReadableException} 异常的方法。
+     * 当客户端请求的 JSON 数据格式错误或无法解析时，此方法会捕获异常，
+     * 并返回统一的错误响应，包含状态码 400 和错误提示信息。
+     *
+     * @param e 捕获到的 {@code HttpMessageNotReadableException} 异常对象，包含解析失败的详细信息。
+     * @return 一个 {@code ResponseEntity} 对象，其中封装了错误信息 {@code Result} 实例，状态码为 400。
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Result<?>> handleHttpMessageNotReadableException(HttpMessageNotReadableException e){
+        log.warn("JSON解析失败: {}", e.getMessage());
+        Result<?> result = Result.fail(ResultCode.BAD_REQUEST);
+        return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
     }
 
     /**

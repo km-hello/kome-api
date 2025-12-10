@@ -57,7 +57,7 @@ public class MemoServiceImpl extends ServiceImpl<MemoMapper, Memo> implements Me
     public Void updateMemoById(Long id, MemoUpdateRequest request) {
         Memo memo = getById(id);
         if(memo == null){
-            throw new ServiceException(ResultCode.NOT_FOUND);
+            throw new ServiceException(ResultCode.NOT_FOUND, "Memo 不存在");
         }
         Memo updateMemo = new Memo();
         BeanUtils.copyProperties(request, updateMemo);
@@ -79,7 +79,7 @@ public class MemoServiceImpl extends ServiceImpl<MemoMapper, Memo> implements Me
     public Void deleteMemoById(Long id) {
         Memo memo = getById(id);
         if(memo == null){
-            throw new ServiceException(ResultCode.NOT_FOUND);
+            throw new ServiceException(ResultCode.NOT_FOUND, "Memo 不存在");
         }
         removeById(id);
         return null;

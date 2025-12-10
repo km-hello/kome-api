@@ -56,7 +56,7 @@ public class LinkServiceImpl extends ServiceImpl<LinkMapper, Link> implements Li
     public Void updateLinkById(Long id, LinkUpdateRequest request) {
         Link link = getById(id);
         if(link == null){
-            throw new ServiceException(ResultCode.NOT_FOUND);
+            throw new ServiceException(ResultCode.NOT_FOUND, "友链不存在");
         }
         Link updateLink = new Link();
         BeanUtils.copyProperties(request, updateLink);
@@ -76,7 +76,7 @@ public class LinkServiceImpl extends ServiceImpl<LinkMapper, Link> implements Li
     public Void deleteLinkById(Long id) {
         Link link = getById(id);
         if(link == null){
-            throw new ServiceException(ResultCode.NOT_FOUND);
+            throw new ServiceException(ResultCode.NOT_FOUND, "友链不存在");
         }
         removeById(id);
         return null;

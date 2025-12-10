@@ -121,7 +121,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                     .ne(User::getId, user.getId())
                     .exists();
             if(isUsernameTaken){
-                throw new ServiceException(ResultCode.BAD_REQUEST, "用户名已存在");
+                throw new ServiceException(ResultCode.BAD_REQUEST, "用户名已被占用");
             }
         }
 
@@ -178,23 +178,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     /**
-     * 检查用户ID是否合法并获取对应的用户信息。
-     * 如果用户ID为空或对应的用户不存在，则抛出业务异常。
+     * 检查用户 ID 是否有效，并返回对应的用户信息。
+     * 如果用户 ID 为空或用户不存在，将抛出自定义业务异常。
      *
-     * @param currentUserId 当前用户的ID，不允许为 null。
-     * @return 存在的用户对象 {@code User}。
-     * @throws ServiceException 当用户ID为空时抛出未授权异常（401）；当未找到对应用户时抛出未找到异常（404）。
+     * @param currentUserId 当前用户的 ID，不能为 null。
+     * @return 对应的用户实体对象 {@code User}。
+     * @throws ServiceException 当用户 ID 为空或用户不存在时抛出异常。
      */
     private User checkAndGetUser(Long currentUserId) {
         // 前置检查
         if(currentUserId == null){
-            throw new ServiceException(ResultCode.UNAUTHORIZED);
+            throw new ServiceException(ResultCode.UNAUTHORIZED, "无效的身份凭证");
         }
 
         // 检查用户是否存在
         User user = getById(currentUserId);
         if(user == null){
-            throw new ServiceException(ResultCode.NOT_FOUND);
+            throw new ServiceException(ResultCode.UNAUTHORIZED, "用户不存在或已注销");
         }
         return user;
     }

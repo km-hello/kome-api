@@ -8,6 +8,7 @@ import com.kmo.kome.dto.request.TagUpdateRequest;
 import com.kmo.kome.dto.response.TagPostCountResponse;
 import com.kmo.kome.dto.response.TagResponse;
 import com.kmo.kome.service.TagService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,7 +33,7 @@ public class TagController {
      * @return 包含已创建标签信息的结果对象。
      */
     @PostMapping("/api/admin/tags")
-    public Result<TagResponse> createTag(@RequestBody TagCreateRequest request){
+    public Result<TagResponse> createTag(@Valid @RequestBody TagCreateRequest request){
         return Result.success(tagService.createTag(request.getName()));
     }
 
@@ -45,7 +46,7 @@ public class TagController {
      * @return 包含更新后标签信息的结果对象。
      */
     @PutMapping("/api/admin/tags/{id}")
-    public Result<TagResponse> updateTagById(@PathVariable Long id, @RequestBody TagUpdateRequest request){
+    public Result<TagResponse> updateTagById(@PathVariable Long id, @Valid @RequestBody TagUpdateRequest request){
         return Result.success(tagService.updateTagById(id, request.getName()));
     }
 
@@ -69,7 +70,7 @@ public class TagController {
      * @return 包含标签信息及文章数量的分页查询结果。
      */
     @GetMapping("/api/admin/tags")
-    public Result<PageResult<TagPostCountResponse>> getAdminTagPage(TagQueryRequest request){
+    public Result<PageResult<TagPostCountResponse>> getAdminTagPage(@Valid TagQueryRequest request){
         return Result.success(tagService.getAdminTagPage(request));
     }
 

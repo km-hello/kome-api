@@ -30,7 +30,7 @@ public class UserController {
      * @return 登录结果，包含 JWT Token、过期时间及用户基本信息。
      */
     @PostMapping("/api/user/login")
-    public Result<UserLoginResponse> login(@RequestBody UserLoginRequest request) {
+    public Result<UserLoginResponse> login(@Valid @RequestBody UserLoginRequest request) {
         return Result.success(userService.login(request));
     }
 
@@ -45,6 +45,14 @@ public class UserController {
         return Result.success(userService.getUserInfoById(currentUserId));
     }
 
+    /**
+     * 更新指定用户的基本信息。
+     * 根据当前登录用户的 ID 和更新数据，调用用户服务层方法完成用户信息的修改。
+     *
+     * @param currentUserId 当前登录用户的 ID，由认证框架自动解析。
+     * @param request 包含用户更新信息的请求对象，需通过注解校验，包含用户名、昵称、头像、邮箱和个人描述等数据。
+     * @return 包含更新后的用户详细信息的结果对象，包括用户 ID、用户名、昵称、头像、邮箱和个人描述等。
+     */
     @PutMapping("/api/admin/user")
     public Result<UserInfoResponse> updateUserInfoById(@AuthenticationPrincipal Long currentUserId, @Valid @RequestBody UserUpdateRequest request){
         return Result.success(userService.updateUserInfoById(currentUserId, request));

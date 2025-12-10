@@ -51,7 +51,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
      * @throws ServiceException 如果文章别名重复或关联的标签无效，则抛出包含对应错误信息的业务异常。
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Long createPost(PostCreateRequest request) {
         // 检查别名是否被占用
         checkSlugUniqueness(request.getSlug(), null);
@@ -82,7 +82,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
      * @throws ServiceException 如果文章不存在，则抛出包含 404 状态的业务异常
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Void deletePostById(Long id) {
         // 检查 post 是否存在
         Post post = getById(id);
@@ -96,7 +96,14 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
                         .eq(PostTag::getPostId, id)
         );
 
-        // 删除文章
+        // 为了释放唯一索引，修改slug
+        String newSlug = post.getSlug() + "_del_" + System.currentTimeMillis();
+        post.setSlug(newSlug);
+
+        // 更新 slug
+        updateById(post);
+
+        // 执行逻辑删除
         removeById(id);
         return null;
     }
@@ -112,7 +119,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
      * @throws ServiceException 如果文章不存在，则抛出包含 404 状态的业务异常
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Void updatePostById(Long id, PostUpdateRequest request) {
         // 检查文章是否存在
         Post oldPost = getById(id);

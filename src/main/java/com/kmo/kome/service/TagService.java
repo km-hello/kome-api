@@ -7,6 +7,7 @@ import com.kmo.kome.dto.request.TagQueryRequest;
 import com.kmo.kome.dto.response.TagPostCountResponse;
 import com.kmo.kome.dto.response.TagResponse;
 import com.kmo.kome.entity.Tag;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -23,7 +24,7 @@ public interface TagService extends IService<Tag> {
 
     Void deleteTagById(Long id);
 
-    PageResult<TagPostCountResponse> getAdminTagPage(TagQueryRequest request);
+    PageResult<TagPostCountResponse> getAdminTagPage(@Valid TagQueryRequest request);
 
     List<TagPostCountResponse> getPublicTagList();
 

@@ -1,6 +1,7 @@
 package com.kmo.kome.dto.request;
 
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
@@ -10,9 +11,11 @@ import lombok.Data;
  */
 @Data
 public class MemoQueryRequest {
+    @NotNull(message = "页码不能为空")
     @Min(value = 1, message = "页码最小为1")
     private Integer pageNum = 1;
 
+    @NotNull(message = "每页数量不能为空")
     @Min(value = 1, message = "每页数量最少为1")
     private Integer pageSize = 10;
 

@@ -18,3 +18,11 @@ jwt:
 
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha

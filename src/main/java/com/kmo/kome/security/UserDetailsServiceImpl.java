@@ -39,17 +39,20 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     /**
-     * 根据用户名加载用户
+     * 根据用户名或邮箱加载用户的详细信息，用于 Spring Security 认证过程中查询用户数据。
+     * 如果指定的用户名或邮箱不存在，则抛出 UsernameNotFoundException 异常。
      *
-     * @param username 前端提交的用户名
-     * @return Spring Security 要求的 UserDetails 对象
-     * @throws UsernameNotFoundException 如果用户不存在
+     * @param username 用户名或邮箱，用于标识用户的唯一登录凭证。
+     * @return 包含用户详细信息的 CustomUserDetails 对象。
+     * @throws UsernameNotFoundException 如果未找到与指定用户名或邮箱匹配的用户。
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // 1. 查询数据库（改用懒加载）
+        // 1. 查询数据库（改用懒加载），支持用户名或邮箱登录
         User user = getUserService().getOne(new LambdaQueryWrapper<User>()
-                .eq(User::getUsername, username));
+                .eq(User::getUsername, username)
+                .or()
+                .eq(User::getEmail, username));
 
         // 2. 检查用户是否存在
         if (user == null) {

@@ -10,8 +10,8 @@ import lombok.Data;
  */
 @Data
 public class UserLoginRequest {
-    @NotBlank(message = "用户名不能为空")
-    @Size(max = 50, message = "用户名过长")
+    @NotBlank(message = "用户名/邮箱不能为空")
+    @Size(max = 50, message = "用户名/邮箱过长")
     private String username;
 
     @NotBlank(message = "密码不能为空")

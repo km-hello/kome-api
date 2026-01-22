@@ -22,6 +22,9 @@ public class Link {
     private String avatar;
     private String description;
 
+    // 状态: 1=公开, 0=隐藏, 默认0
+    private Integer status;
+
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 }

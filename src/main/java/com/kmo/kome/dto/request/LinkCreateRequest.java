@@ -1,8 +1,10 @@
 package com.kmo.kome.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import org.hibernate.validator.constraints.Range;
 
 /**
  * 创建友链请求类。
@@ -24,4 +26,9 @@ public class LinkCreateRequest {
 
     @Size(max = 255, message = "友链描述不能超过255个字符")
     private String description;
+
+    // 状态: 1=公开, 0=隐藏, 默认 0
+    @NotNull(message = "友链状态不能为空")
+    @Range(min = 0, max = 1, message = "状态只能是 0 或 1")
+    private Integer status = 0;
 }

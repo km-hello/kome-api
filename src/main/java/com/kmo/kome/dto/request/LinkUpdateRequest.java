@@ -2,6 +2,7 @@ package com.kmo.kome.dto.request;
 
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import org.hibernate.validator.constraints.Range;
 
 /**
  * 更新友链请求类。
@@ -21,4 +22,7 @@ public class LinkUpdateRequest {
 
     @Size(max = 255, message = "友链描述不能超过255个字符")
     private String description;
+
+    @Range(min = 0, max = 1, message = "状态只能是 0 或 1")
+    private Integer status;
 }

@@ -22,4 +22,6 @@ public class LinkQueryRequest {
 
     // 关键词筛选
     private String keyword;
+    // 按状态筛选
+    private Integer status;
 }

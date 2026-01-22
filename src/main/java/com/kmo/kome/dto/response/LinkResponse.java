@@ -20,4 +20,5 @@ public class LinkResponse {
     private String url;
     private String avatar;
     private String description;
+    private Integer status;
 }

@@ -19,7 +19,8 @@ CREATE TABLE `user` (
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_username` (`username`)
+  UNIQUE KEY `uk_username` (`username`),
+  UNIQUE KEY `uk_email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
 
 -- ----------------------------
@@ -111,6 +112,6 @@ CREATE TABLE `link` (
 INSERT INTO `user`
 (id, username, password, nickname, avatar, email, description, is_owner, is_deleted, create_time, update_time)
 VALUES
-(1, 'admin', '$2a$10$BSwlDea05yboOEsyZUOCpu/GUaIn7HyN4XZefcOOhUiVhN68f4T3e', '超级管理员', 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png', 'admin@blog.com', 'Hello World', 1, 0, NOW(), NOW());
+(1, 'admin', '$2a$10$BSwlDea05yboOEsyZUOCpu/GUaIn7HyN4XZefcOOhUiVhN68f4T3e', '超级管理员', 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png', 'admin@example.com', 'Hello World', 1, 0, NOW(), NOW());
 
 SET FOREIGN_KEY_CHECKS = 1;

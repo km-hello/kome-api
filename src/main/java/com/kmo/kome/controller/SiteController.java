@@ -14,14 +14,25 @@ public class SiteController {
     private final SiteService siteService;
 
     /**
-     * 获取站点信息的接口。
-     * 调用服务层方法获取站点的基本信息，并封装为统一的结果对象返回。
+     * 获取公共可见的站点信息。
+     * 调用服务层方法，查询站点的基本信息，包括所有者信息和统计数据，并返回给前端。
      *
-     * @return 包含站点信息的结果对象，数据类型为 {@code SiteInfoResponse}。
+     * @return 包含站点信息的结果对象，包括所有者的昵称、头像、描述以及站点的统计数据。
      */
     @GetMapping("/api/site/info")
-    public Result<SiteInfoResponse> getSiteInfo(){
-        return Result.success(siteService.getSiteInfo());
+    public Result<SiteInfoResponse> getPublicSiteInfo(){
+        return Result.success(siteService.getPublicSiteInfo());
+    }
+
+    /**
+     * 获取管理员权限下的站点信息。
+     * 调用服务层方法，查询站点的详细信息，包括所有者信息和统计数据，并返回结果。
+     *
+     * @return 包含站点信息的结果对象，包括所有者的昵称、头像、描述以及站点的统计数据。
+     */
+    @GetMapping("/api/admin/site/info")
+    public Result<SiteInfoResponse> getAdminSiteInfo(){
+        return Result.success(siteService.getAdminSiteInfo());
     }
 
 }

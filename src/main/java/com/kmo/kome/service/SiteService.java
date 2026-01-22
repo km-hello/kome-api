@@ -9,5 +9,7 @@ import com.kmo.kome.dto.response.SiteInfoResponse;
  * 通常包括站点配置、统计信息等功能。
  */
 public interface SiteService {
-    SiteInfoResponse getSiteInfo();
+    SiteInfoResponse getPublicSiteInfo();
+
+    SiteInfoResponse getAdminSiteInfo();
 }

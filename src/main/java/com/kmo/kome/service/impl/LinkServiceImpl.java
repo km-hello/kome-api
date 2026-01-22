@@ -96,6 +96,8 @@ public class LinkServiceImpl extends ServiceImpl<LinkMapper, Link> implements Li
     public List<LinkResponse> getPublicLinkList(LinkQueryRequest request) {
         // 设置不分页
         request.setPageSize(-1);
+        // 只查询公开的链接
+        request.setStatus(1);
         return getAdminLinkPage(request).getRecords();
     }
 
@@ -121,6 +123,7 @@ public class LinkServiceImpl extends ServiceImpl<LinkMapper, Link> implements Li
         // 构建查询条件
         LambdaQueryWrapper<Link> wrapper = new LambdaQueryWrapper<>();
         wrapper.like(StringUtils.hasText(request.getKeyword()), Link::getName, request.getKeyword())
+                .eq(request.getStatus() != null, Link::getStatus, request.getStatus())
                 .orderByAsc(Link::getCreateTime);
 
         // 查询数据库

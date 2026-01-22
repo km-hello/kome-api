@@ -100,6 +100,7 @@ CREATE TABLE `link` (
   `url` varchar(255) NOT NULL COMMENT '站点链接',
   `avatar` varchar(255) DEFAULT NULL COMMENT '站点Logo URL',
   `description` varchar(255) DEFAULT NULL COMMENT '一句话描述',
+  `status` tinyint NOT NULL DEFAULT '0' COMMENT '状态: 0=隐藏, 1=公开',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
   PRIMARY KEY (`id`)

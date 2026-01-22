@@ -67,9 +67,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 4. 组装并返回 Response
         return UserLoginResponse.builder()
                 .token(token)
+                .expiresIn(expiration)
                 .username(user.getUsername())
                 .nickname(user.getNickname())
-                .expiresIn(expiration)
+                .email(user.getEmail())
                 .avatar(user.getAvatar())
                 .build();
     }

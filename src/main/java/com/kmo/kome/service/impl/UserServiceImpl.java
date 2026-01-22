@@ -99,14 +99,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     /**
-     * 更新指定用户的基本信息。
-     * 如果当前用户 ID 为空，抛出未登录异常。
-     * 如果用户不存在或更新的用户名已被占用，将抛出相应的业务异常。
+     * 根据用户 ID 更新用户信息。
+     * 验证用户名和邮箱的唯一性，根据请求数据更新用户基本信息，并返回更新后的用户信息。
+     * 如果用户 ID 无效或请求数据不合法，将抛出业务异常。
      *
-     * @param currentUserId 当前用户的 ID，不允许为空。
-     * @param request 包含更新数据的请求对象，可能包括用户名、昵称、头像、邮箱和描述等字段。
-     * @return 更新后的用户信息响应对象 {@code UserInfoResponse}。
-     * @throws ServiceException 当用户未登录、用户不存在或用户名已被占用时抛出相应的异常。
+     * @param currentUserId 当前执行操作的用户 ID，不能为 null。
+     *        用于标识待更新的目标用户。
+     * @param request 包含更新用户信息所需数据的请求对象，不能为 null。
+     *        包括用户名、昵称、邮箱等多个字段的更新内容。
+     * @return 包含用户更新后关键信息的响应对象 {@code UserInfoResponse}。
+     * @throws ServiceException 当以下情况之一发生时抛出业务异常：
+     *         1. 用户 ID 无效或不存在。
+     *         2. 待更新的用户名或邮箱已被占用。
      */
     @Override
     public UserInfoResponse updateUserInfoById(Long currentUserId, UserUpdateRequest request) {
@@ -122,6 +126,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                     .exists();
             if(isUsernameTaken){
                 throw new ServiceException(ResultCode.BAD_REQUEST, "用户名已被占用");
+            }
+        }
+
+        // 检查邮箱是否被占用
+        String newEmail = request.getEmail();
+        if(StringUtils.hasText(newEmail) && !newEmail.equals(user.getEmail())){
+            boolean isEmailTaken  = lambdaQuery()
+                    .eq(User::getEmail, newEmail)
+                    .ne(User::getId, user.getId())
+                    .exists();
+            if(isEmailTaken){
+                throw new ServiceException(ResultCode.BAD_REQUEST, "邮箱已被占用");
             }
         }
 

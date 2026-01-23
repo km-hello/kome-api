@@ -136,7 +136,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
         Page<TagPostCountResponse> pageRequest = new Page<>(request.getPageNum(), request.getPageSize());
 
         // 调用为后台管理接口定制的 Mapper 方法
-        Page<TagPostCountResponse> tagPage = baseMapper.selectAdminTagPage(pageRequest);
+        Page<TagPostCountResponse> tagPage = baseMapper.selectAdminTagPage(pageRequest, request);
 
         // 封装返回结果
         return PageResult.<TagPostCountResponse>builder()

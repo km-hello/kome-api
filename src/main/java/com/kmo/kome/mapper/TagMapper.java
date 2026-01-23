@@ -42,7 +42,7 @@ public interface TagMapper extends BaseMapper<Tag> {
      * @param page 分页参数，包含当前页码和每页数量。
      * @return 包含标签及其关联文章数量信息的分页结果。
      */
-    Page<TagPostCountResponse> selectAdminTagPage(Page<TagPostCountResponse> page);
+    Page<TagPostCountResponse> selectAdminTagPage(Page<TagPostCountResponse> page, @Param("query") TagQueryRequest request);
 
     /**
      * 查询所有公开标签的列表。

@@ -75,6 +75,17 @@ public class TagController {
     }
 
     /**
+     * 获取所有标签列表。
+     * 调用服务层方法查询所有标签信息，并返回查询结果。
+     *
+     * @return 包含所有标签信息的结果对象，数据部分为 {@code List<TagResponse>} 类型。
+     */
+    @GetMapping("/api/admin/tags/all")
+    public Result<List<TagResponse>> getAllTags(){
+        return Result.success(tagService.getAdminTagList());
+    }
+
+    /**
      * 获取公共可见的标签及其对应的文章数量列表。
      * 调用服务层方法，查询所有公开标签的信息并返回。
      *

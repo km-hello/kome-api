@@ -148,6 +148,22 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
     }
 
     /**
+     * 获取后台管理系统的标签列表。
+     * 按标签的创建时间倒序排序，返回的标签包括其唯一标识和名称。
+     *
+     * @return 包含标签信息的列表，其中每个标签包含唯一标识和名称。
+     */
+    @Override
+    public List<TagResponse> getAdminTagList() {
+        return lambdaQuery()
+                .orderByDesc(Tag::getCreateTime)
+                .list()
+                .stream()
+                .map(tag -> new TagResponse(tag.getId(), tag.getName()))
+                .toList();
+    }
+
+    /**
      * 获取所有公开标签的列表，包括标签及其关联文章的数量。
      * 该方法常用于前端展示公开标签信息的场景。
      *

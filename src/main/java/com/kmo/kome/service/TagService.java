@@ -31,4 +31,6 @@ public interface TagService extends IService<Tag> {
     List<TagResponse> findTagsByPostId(Long postId);
 
     List<TagWhitPostIdDTO> findTagsByPostIds(List<Long> postIds);
+
+    List<TagResponse> getAdminTagList();
 }

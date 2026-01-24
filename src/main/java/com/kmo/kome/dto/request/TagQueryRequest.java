@@ -18,4 +18,7 @@ public class TagQueryRequest {
     @NotNull(message = "每页数量不能为空")
     @Min(value = 1, message = "每页数量最少为1")
     private Integer pageSize = 10;
+
+    // 关键词筛选
+    private String keyword;
 }

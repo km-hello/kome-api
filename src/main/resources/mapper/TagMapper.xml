@@ -68,10 +68,15 @@
             tag t
         LEFT JOIN
             post_tag pt ON t.id = pt.tag_id
+        <where>
+            <if test="query.keyword != null and query.keyword != ''">
+                AND t.name LIKE CONCAT('%', #{query.keyword}, '%')
+            </if>
+        </where>
         GROUP BY
             t.id, t.name
         ORDER BY
-            post_count DESC, t.id ASC
+            t.create_time DESC
     </select>
 
     <!--

@@ -136,7 +136,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
         Page<TagPostCountResponse> pageRequest = new Page<>(request.getPageNum(), request.getPageSize());
 
         // 调用为后台管理接口定制的 Mapper 方法
-        Page<TagPostCountResponse> tagPage = baseMapper.selectAdminTagPage(pageRequest);
+        Page<TagPostCountResponse> tagPage = baseMapper.selectAdminTagPage(pageRequest, request);
 
         // 封装返回结果
         return PageResult.<TagPostCountResponse>builder()
@@ -145,6 +145,22 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
                 .size(tagPage.getSize())
                 .current(tagPage.getCurrent())
                 .build();
+    }
+
+    /**
+     * 获取后台管理系统的标签列表。
+     * 按标签的创建时间倒序排序，返回的标签包括其唯一标识和名称。
+     *
+     * @return 包含标签信息的列表，其中每个标签包含唯一标识和名称。
+     */
+    @Override
+    public List<TagResponse> getAdminTagList() {
+        return lambdaQuery()
+                .orderByDesc(Tag::getCreateTime)
+                .list()
+                .stream()
+                .map(tag -> new TagResponse(tag.getId(), tag.getName()))
+                .toList();
     }
 
     /**

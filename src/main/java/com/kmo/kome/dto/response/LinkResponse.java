@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 /**
  * 链接响应 DTO 类。
  * 用于封装链接相关的信息并返回给前端。
@@ -21,4 +23,6 @@ public class LinkResponse {
     private String avatar;
     private String description;
     private Integer status;
+
+    private LocalDateTime createTime;
 }

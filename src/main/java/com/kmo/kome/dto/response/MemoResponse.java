@@ -24,5 +24,4 @@ public class MemoResponse {
     private Integer status;
 
     private LocalDateTime createTime;
-    private LocalDateTime updateTime;
 }

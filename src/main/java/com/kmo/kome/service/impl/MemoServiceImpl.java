@@ -115,26 +115,30 @@ public class MemoServiceImpl extends ServiceImpl<MemoMapper, Memo> implements Me
     }
 
     /**
-     * 获取公共 Memo 分页列表。
-     * 根据传入的查询请求，设置状态为公开状态（1），并调用后台管理查询方法获取分页结果。
+     * 获取公开的 Memo 分页列表。
+     * 此方法用于查询已发布的 Memo 记录，并按照置顶优先的规则进行排序。
+     * 默认查询条件会将状态设置为已发布，并禁止忽略置顶排序。
+     * 内部调用后台分页查询方法执行实际查询。
      *
-     * @param request 包含分页查询条件的请求对象，须包含页码和每页数量，可选关键词。
+     * @param request 包含分页查询参数的对象，必须提供页码和每页数量，可选提供关键词进行筛选。
      * @return 包含查询结果的分页对象，记录列表为 MemoResponse 类型。
      */
     @Override
     public PageResult<MemoResponse> getPublicMemoPage(MemoQueryRequest request) {
         // 仅查询已发布的
         request.setStatus(1);
+        // 公开接口始终按置顶优先排序
+        request.setIgnorePinned(false);
         return getAdminMemoPage(request);
     }
 
     /**
-     * 获取 Memo 分页列表，提供用于后台管理的分页查询功能。
-     * 根据请求参数，包括关键词、状态、页码和每页数量，动态构建查询条件，
-     * 并返回包含分页数据的结果对象。
+     * 获取管理员 Memo 分页列表。
+     * 此方法支持按照关键字和状态筛选 Memo 数据，并根据指定分页参数返回结果。
+     * 如果参数未指定是否忽略置顶排序，则默认包含置顶逻辑。
      *
-     * @param request 包含分页查询参数的对象，必须提供页码和每页数量，可选提供关键词和状态进行筛选
-     * @return 包含查询结果的分页对象，记录列表为 MemoResponse 类型
+     * @param request 包含分页查询条件的请求对象，其中包括页码、每页数量、关键字、状态以及是否忽略置顶排序的选项。
+     * @return 返回包含分页结果的 PageResult 对象，其中记录列表为 MemoResponse 类型。
      */
     @Override
     public PageResult<MemoResponse> getAdminMemoPage(MemoQueryRequest request) {
@@ -144,9 +148,13 @@ public class MemoServiceImpl extends ServiceImpl<MemoMapper, Memo> implements Me
         // 构建查询条件
         LambdaQueryWrapper<Memo> wrapper = new LambdaQueryWrapper<>();
         wrapper.like(StringUtils.hasText(request.getKeyword()), Memo::getContent, request.getKeyword()) // 关键字搜索 (content LIKE '%keyword%')
-                .eq(request.getStatus() != null, Memo::getStatus, request.getStatus()) // 状态筛选 (如果前端传了 status 就查特定的，没传就查所有)
-                .orderByDesc(Memo::getIsPinned) // 排序: 置顶优先 -> 创建时间倒序
-                .orderByDesc(Memo::getCreateTime);
+                .eq(request.getStatus() != null, Memo::getStatus, request.getStatus()); // 状态筛选 (如果前端传了 status 就查特定的，没传就查所有)
+
+        // 排序逻辑：ignorePinned 为 true 时跳过置顶排序
+        if (!Boolean.TRUE.equals(request.getIgnorePinned())) {
+            wrapper.orderByDesc(Memo::getIsPinned);
+        }
+        wrapper.orderByDesc(Memo::getCreateTime);
 
         // 查询数据库
         Page<Memo> memoPage = page(page, wrapper);

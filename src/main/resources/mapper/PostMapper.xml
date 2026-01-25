@@ -11,8 +11,10 @@
         -   1. 这是一个核心的 **动态SQL查询**，使用 `<if>` 和 `<where>` 标签根据传入的 `query` 对象动态构建查询条件。
         -   2. 支持的过滤条件包括：按 **关键词(keyword)** 模糊搜索文章标题、按 **文章状态(status)** 筛选、按 **标签ID(tagId)** 筛选。
         -   3. **性能优化**: 只有当需要按 `tagId` 筛选时，才会 `JOIN` `post_tag` 关联表，避免了不必要的表连接。
-        -   4. **DISTINCT 关键字**: 因为 `post` 与 `post_tag` 是“一对多”关系，为防止未来扩展或JOIN其他“一对多”表时导致文章记录重复，使用 `DISTINCT` 可以确保返回结果的唯一性。
-        -   5. **排序逻辑**: 结果集首先按 **是否置顶(is_pinned)** 降序排列，然后按 **创建时间(create_time)** 降序排列，以确保置顶和最新的文章优先显示。
+        -   4. **DISTINCT 关键字**: 因为 `post` 与 `post_tag` 是"一对多"关系，为防止未来扩展或JOIN其他"一对多"表时导致文章记录重复，使用 `DISTINCT` 可以确保返回结果的唯一性。
+        -   5. **排序逻辑**:
+        -       - 默认情况下，结果集首先按 **是否置顶(is_pinned)** 降序排列，然后按 **创建时间(create_time)** 降序排列，以确保置顶和最新的文章优先显示。
+        -       - 当 `ignorePinned = true` 时，跳过置顶排序，仅按 **创建时间(create_time)** 降序排列（用于管理员按时间线查看文章）。
         -   6. **基础条件**: 查询默认会排除所有已被逻辑删除 (`is_deleted = 0`) 的文章。
     -->
     <select id="selectPostPage" resultType="com.kmo.kome.dto.response.PostSimpleResponse">
@@ -36,6 +38,9 @@
             </if>
         </where>
         ORDER BY
-            p.is_pinned DESC, p.create_time DESC
+            <if test="query.ignorePinned == null or query.ignorePinned == false">
+                p.is_pinned DESC,
+            </if>
+            p.create_time DESC
     </select>
 </mapper>

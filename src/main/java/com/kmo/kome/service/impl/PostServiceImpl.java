@@ -200,17 +200,20 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
     }
 
     /**
-     * 获取已发布文章的分页列表。
-     * 根据提供的查询条件，仅查询状态为已发布的文章，并返回分页后的结果数据。
+     * 查询公开文章分页数据。
+     * 该方法用于获取已发布的文章列表，并按照置顶优先的规则进行排序。
+     * 仅返回符合筛选条件的文章概要信息。
      *
-     * @param request 查询请求对象，包括分页参数（页码和每页数量）、关键词过滤、标签筛选等字段。
-     *                该方法内部会自动设置状态为已发布（status=1）。
-     * @return 包含文章概要信息的分页结果对象。
+     * @param request 文章查询请求对象，用于定义分页参数（页码、每页数量）以及筛选条件（关键词、标签）。
+     *                方法内部会将状态强制设置为已发布（status=1），并重置为按照置顶优先排序。
+     * @return 包含文章概要信息的分页结果对象。结果包括总记录数、分页信息以及文章数据列表。
      */
     @Override
     public PageResult<PostSimpleResponse> getPublicPostPage(PostQueryRequest request) {
         // 仅允许查询已发布的文章
         request.setStatus(1);
+        // 公开接口始终按置顶优先排序
+        request.setIgnorePinned(false);
         return getAdminPostPage(request);
     }
 

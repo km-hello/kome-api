@@ -23,4 +23,7 @@ public class MemoQueryRequest {
     private String keyword;
     // 按状态筛选
     private Integer status;
+
+    // 是否忽略置顶排序（仅管理员接口使用）
+    private Boolean ignorePinned = false;
 }

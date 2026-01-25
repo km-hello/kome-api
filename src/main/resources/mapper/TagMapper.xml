@@ -63,7 +63,8 @@
         SELECT
             t.id,
             t.name,
-            COUNT(pt.post_id) AS post_count
+            COUNT(pt.post_id) AS post_count,
+            t.create_time
         FROM
             tag t
         LEFT JOIN
@@ -74,7 +75,7 @@
             </if>
         </where>
         GROUP BY
-            t.id, t.name
+            t.id, t.name, t.create_time
         ORDER BY
             t.create_time DESC
     </select>
@@ -90,7 +91,8 @@
         SELECT
             t.id,
             t.name,
-            COUNT(p.id) AS post_count
+            COUNT(p.id) AS post_count,
+            t.create_time
         FROM
             tag t
         INNER JOIN
@@ -100,7 +102,7 @@
         WHERE
             p.status = 1 AND p.is_deleted = 0
         GROUP BY
-            t.id, t.name
+            t.id, t.name, t.create_time
         ORDER BY
             post_count DESC, t.id ASC
     </select>

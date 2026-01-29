@@ -232,7 +232,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
         request.setPageSize(-1); // 查询全部数据（pageSize=-1，避免分页）
         // 获取原始数据, 并按照创建时间倒叙排序
         List<PostSimpleResponse> rawPosts = getAdminPostPage(request).getRecords().stream()
-                .sorted(Comparator.comparing(PostSimpleResponse::getCoverImage).reversed())
+                .sorted(Comparator.comparing(PostSimpleResponse::getCreateTime).reversed())
                 .toList();
         // 空数据直接返回空列表
         if(CollectionUtils.isEmpty(rawPosts)){
@@ -317,7 +317,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
                     .size(postPage.getSize())
                     .current(postPage.getCurrent())
                     .build();
-        };
+        }
 
         // 批量获取关联的标签
         List<Long> postIds = posts.stream()

@@ -34,4 +34,14 @@ public class PostDetailResponse {
     private LocalDateTime updateTime;
 
     private List<TagResponse> tags;
+
+    /**
+     * 上一篇文章（比当前文章发布时间早的最新一篇）
+     */
+    private PostNavResponse previous;
+
+    /**
+     * 下一篇文章（比当前文章发布时间晚的最早一篇）
+     */
+    private PostNavResponse next;
 }

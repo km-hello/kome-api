@@ -13,6 +13,7 @@ import com.kmo.kome.dto.request.PostQueryRequest;
 import com.kmo.kome.dto.request.PostUpdateRequest;
 import com.kmo.kome.dto.response.PostArchiveResponse;
 import com.kmo.kome.dto.response.PostDetailResponse;
+import com.kmo.kome.dto.response.PostNavResponse;
 import com.kmo.kome.dto.response.PostSimpleResponse;
 import com.kmo.kome.dto.response.TagResponse;
 import com.kmo.kome.entity.Post;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -370,7 +372,41 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
         List<TagResponse> tags = tagService.findTagsByPostId(post.getId());
         response.setTags(tags);
 
+        // 查询并设置上一篇/下一篇导航（仅对已发布文章）
+        if (post.getStatus() != null && post.getStatus() == 1) {
+            response.setPrevious(findAdjacentPost(post.getCreateTime(), true));
+            response.setNext(findAdjacentPost(post.getCreateTime(), false));
+        }
+
         return response;
+    }
+
+    /**
+     * 查询相邻的已发布文章。
+     *
+     * @param createTime 当前文章的创建时间
+     * @param isPrevious true 查询上一篇（更早的），false 查询下一篇（更晚的）
+     * @return 相邻文章的导航信息，如果不存在则返回 null
+     */
+    private PostNavResponse findAdjacentPost(LocalDateTime createTime, boolean isPrevious) {
+        Post post = lambdaQuery()
+                .select(Post::getId, Post::getTitle, Post::getSlug)
+                .eq(Post::getStatus, 1)
+                .apply(isPrevious
+                        ? "create_time < {0}"
+                        : "create_time > {0}", createTime)
+                .orderBy(true, !isPrevious, Post::getCreateTime)
+                .last("LIMIT 1")
+                .one();
+
+        if (post == null) {
+            return null;
+        }
+        return PostNavResponse.builder()
+                .id(post.getId())
+                .title(post.getTitle())
+                .slug(post.getSlug())
+                .build();
     }
 
 

@@ -1,6 +1,5 @@
 package com.kmo.kome.dto.response;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -34,4 +33,14 @@ public class PostDetailResponse {
     private LocalDateTime updateTime;
 
     private List<TagResponse> tags;
+
+    /**
+     * 上一篇文章（比当前文章发布时间早的最新一篇）
+     */
+    private PostNavResponse previous;
+
+    /**
+     * 下一篇文章（比当前文章发布时间晚的最早一篇）
+     */
+    private PostNavResponse next;
 }

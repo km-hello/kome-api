@@ -6,6 +6,7 @@ import com.kmo.kome.dto.request.MemoCreateRequest;
 import com.kmo.kome.dto.request.MemoQueryRequest;
 import com.kmo.kome.dto.request.MemoUpdateRequest;
 import com.kmo.kome.dto.response.MemoResponse;
+import com.kmo.kome.dto.response.MemoStatsResponse;
 import com.kmo.kome.service.MemoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -92,5 +93,16 @@ public class MemoController {
     @GetMapping("/api/memos/latest")
     public Result<List<MemoResponse>> getLatestMemo(@RequestParam(value = "limit", defaultValue = "2") Integer limit){
         return Result.success(memoService.getLatestMemo(limit));
+    }
+
+    /**
+     * 获取 Memo 统计数据。
+     * 返回已发布 Memo 的总数、总字数、本月数量和最近一条 Memo 的时间。
+     *
+     * @return 包含 Memo 统计数据的结果对象。
+     */
+    @GetMapping("/api/memos/stats")
+    public Result<MemoStatsResponse> getMemoStats(){
+        return Result.success(memoService.getMemoStats());
     }
 }

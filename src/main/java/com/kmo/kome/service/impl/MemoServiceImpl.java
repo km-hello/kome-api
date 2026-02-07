@@ -10,6 +10,7 @@ import com.kmo.kome.dto.request.MemoCreateRequest;
 import com.kmo.kome.dto.request.MemoQueryRequest;
 import com.kmo.kome.dto.request.MemoUpdateRequest;
 import com.kmo.kome.dto.response.MemoResponse;
+import com.kmo.kome.dto.response.MemoStatsResponse;
 import com.kmo.kome.entity.Memo;
 import com.kmo.kome.mapper.MemoMapper;
 import com.kmo.kome.service.MemoService;
@@ -184,6 +185,15 @@ public class MemoServiceImpl extends ServiceImpl<MemoMapper, Memo> implements Me
         MemoResponse response = new MemoResponse();
         BeanUtils.copyProperties(memo, response);
         return response;
+    }
+
+    /**
+     * 查询 Memo 的统计信息，包括总记录数、总字数、当月新增记录数以及最新的创建时间。
+     *
+     * @return 包含上述统计数据的 {@link MemoStatsResponse} 实例
+     */
+    public MemoStatsResponse getMemoStats() {
+        return baseMapper.selectMemoStats();
     }
 
 }

@@ -6,6 +6,7 @@ import com.kmo.kome.dto.request.MemoCreateRequest;
 import com.kmo.kome.dto.request.MemoQueryRequest;
 import com.kmo.kome.dto.request.MemoUpdateRequest;
 import com.kmo.kome.dto.response.MemoResponse;
+import com.kmo.kome.dto.response.MemoStatsResponse;
 import com.kmo.kome.entity.Memo;
 import jakarta.validation.Valid;
 
@@ -29,4 +30,6 @@ public interface MemoService extends IService<Memo> {
     Void deleteMemoById(Long id);
 
     List<MemoResponse> getLatestMemo(Integer limit);
+
+    MemoStatsResponse getMemoStats();
 }

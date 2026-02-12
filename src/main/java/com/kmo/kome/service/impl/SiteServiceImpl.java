@@ -137,7 +137,8 @@ public class SiteServiceImpl implements SiteService {
      * 首次设置管理员账户
      * 仅当系统未初始化时可用，创建第一个管理员账户
      *
-     * @param request 设置请求，包含用户名、密码和可选的昵称、头像、简介、邮箱
+     * @param request 设置请求，包含用户名、密码、昵称、头像、简介、邮箱
+     *                （可选字段由前端填充默认值后发送，确保数据库中始终有值）
      * @throws ServiceException 如果系统已初始化
      */
     @Override
@@ -147,7 +148,7 @@ public class SiteServiceImpl implements SiteService {
             throw new ServiceException(ResultCode.BAD_REQUEST, "系统已初始化");
         }
 
-        // 创建管理员账户（可选字段为空时保持 null，由前端处理默认显示）
+        // 创建管理员账户
         User admin = new User();
         admin.setUsername(request.getUsername());
         admin.setPassword(passwordEncoder.encode(request.getPassword()));

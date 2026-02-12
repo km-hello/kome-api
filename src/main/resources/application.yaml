@@ -1,24 +1,42 @@
+# ==================== Kome API 配置 ====================
+# 生产环境通过环境变量配置敏感信息
+# 首次启动时访问 /setup 页面初始化管理员账户
+
 spring:
   application:
     name: kome-api
 
-  # 设置默认激活的环境。
+  # 环境配置（默认使用 default，开发时使用 dev）
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:default}
 
+  # 数据库配置
   datasource:
-    # 生产环境 Docker 会注入这些环境变量
-    url: jdbc:mysql://${DB_HOST}:3306/${DB_NAME}?serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT:3306}/${DB_NAME}?serverTimezone=Asia/Shanghai
     username: ${DB_USER}
     password: ${DB_PASSWORD}
 
+  # Flyway 数据库迁移
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true    # 已有数据库时自动设置基线
+    validate-on-migrate: true    # 迁移前验证脚本
+
+# 服务端口
+server:
+  port: ${SERVER_PORT:8080}
+
+# JWT 认证配置
 jwt:
   secret: ${JWT_SECRET}
-  expiration: 86400000
+  expiration: ${JWT_EXPIRATION:86400000}  # 默认 24 小时
 
+# MyBatis-Plus 配置
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml
 
+# API 文档配置（Swagger/OpenAPI）
 springdoc:
   api-docs:
     path: /api-docs
@@ -26,3 +44,13 @@ springdoc:
     path: /swagger-ui.html
     tags-sorter: alpha
     operations-sorter: alpha
+
+# 健康检查端点
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never

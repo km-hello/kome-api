@@ -1,3 +1,5 @@
+-- Flyway Migration V1: 初始化数据库表结构
+-- 基于 kome_db_init.sql
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
@@ -5,8 +7,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 -- Table structure for user
 -- ----------------------------
-DROP TABLE IF EXISTS `user`;
-CREATE TABLE `user` (
+CREATE TABLE IF NOT EXISTS `user` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `username` varchar(50) NOT NULL COMMENT '登录账号',
   `password` varchar(255) NOT NULL COMMENT '加密后的密码 (BCrypt)',
@@ -26,8 +27,7 @@ CREATE TABLE `user` (
 -- ----------------------------
 -- Table structure for post
 -- ----------------------------
-DROP TABLE IF EXISTS `post`;
-CREATE TABLE `post` (
+CREATE TABLE IF NOT EXISTS `post` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `title` varchar(255) NOT NULL COMMENT '文章标题',
   `slug` varchar(255) NOT NULL COMMENT '文章别名',
@@ -51,8 +51,7 @@ CREATE TABLE `post` (
 -- ----------------------------
 -- Table structure for tag
 -- ----------------------------
-DROP TABLE IF EXISTS `tag`;
-CREATE TABLE `tag` (
+CREATE TABLE IF NOT EXISTS `tag` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `name` varchar(50) NOT NULL COMMENT '标签名称',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -64,8 +63,7 @@ CREATE TABLE `tag` (
 -- ----------------------------
 -- Table structure for post_tag
 -- ----------------------------
-DROP TABLE IF EXISTS `post_tag`;
-CREATE TABLE `post_tag` (
+CREATE TABLE IF NOT EXISTS `post_tag` (
   `post_id` bigint NOT NULL COMMENT '文章ID',
   `tag_id` bigint NOT NULL COMMENT '标签ID',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '关联创建时间',
@@ -78,8 +76,7 @@ CREATE TABLE `post_tag` (
 -- ----------------------------
 -- Table structure for memo
 -- ----------------------------
-DROP TABLE IF EXISTS `memo`;
-CREATE TABLE `memo` (
+CREATE TABLE IF NOT EXISTS `memo` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `content` text NOT NULL COMMENT '纯文本内容',
   `is_pinned` tinyint NOT NULL DEFAULT '0' COMMENT '是否置顶: 0=否, 1=是',
@@ -93,8 +90,7 @@ CREATE TABLE `memo` (
 -- ----------------------------
 -- Table structure for link
 -- ----------------------------
-DROP TABLE IF EXISTS `link`;
-CREATE TABLE `link` (
+CREATE TABLE IF NOT EXISTS `link` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `name` varchar(100) NOT NULL COMMENT '站点名称',
   `url` varchar(255) NOT NULL COMMENT '站点链接',
@@ -105,14 +101,5 @@ CREATE TABLE `link` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='友情链接表';
-
--- ----------------------------
--- Data Initialization
--- ----------------------------
--- 插入管理员数据，用户名为 "admin"，密码为 "Admin123.."
-INSERT INTO `user`
-(id, username, password, nickname, avatar, email, description, is_owner, is_deleted, create_time, update_time)
-VALUES
-(1, 'admin', '$2a$10$BSwlDea05yboOEsyZUOCpu/GUaIn7HyN4XZefcOOhUiVhN68f4T3e', '超级管理员', 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png', 'admin@example.com', 'Hello World', 1, 0, NOW(), NOW());
 
 SET FOREIGN_KEY_CHECKS = 1;

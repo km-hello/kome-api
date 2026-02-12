@@ -61,6 +61,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // 登录接口
                         .requestMatchers("/api/user/login").permitAll()
+                        // 首次设置接口（公开）
+                        .requestMatchers("/api/site/initialized", "/api/site/setup").permitAll()
                         // 后台管理接口 (需认证)
                         .requestMatchers("/api/admin/**").authenticated()
                         // 其他接口

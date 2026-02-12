@@ -3,6 +3,7 @@ package com.kmo.kome.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.kmo.kome.common.ResultCode;
 import com.kmo.kome.common.exception.ServiceException;
+import com.kmo.kome.dto.request.SetupRequest;
 import com.kmo.kome.dto.response.SiteInfoResponse;
 import com.kmo.kome.entity.Link;
 import com.kmo.kome.entity.Memo;
@@ -10,6 +11,7 @@ import com.kmo.kome.entity.Post;
 import com.kmo.kome.entity.User;
 import com.kmo.kome.service.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -30,6 +32,7 @@ public class SiteServiceImpl implements SiteService {
     private final TagService tagService;
     private final MemoService memoService;
     private final LinkService linkService;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * 获取站点管理员的基础信息和统计数据。
@@ -115,5 +118,45 @@ public class SiteServiceImpl implements SiteService {
                         .unusedTagCount(0L)
                         .build())
                 .build();
+    }
+
+    /**
+     * 检查系统是否已初始化
+     * 通过检测是否存在管理员账户（isOwner = true）来判断
+     *
+     * @return true 表示已初始化，false 表示未初始化
+     */
+    @Override
+    public boolean isInitialized() {
+        return userService.count(
+                new LambdaQueryWrapper<User>().eq(User::getIsOwner, true)
+        ) > 0;
+    }
+
+    /**
+     * 首次设置管理员账户
+     * 仅当系统未初始化时可用，创建第一个管理员账户
+     *
+     * @param request 设置请求，包含用户名、密码和可选的昵称、头像、简介、邮箱
+     * @throws ServiceException 如果系统已初始化
+     */
+    @Override
+    public void setupAdmin(SetupRequest request) {
+        // 检查是否已初始化
+        if (isInitialized()) {
+            throw new ServiceException(ResultCode.BAD_REQUEST, "系统已初始化");
+        }
+
+        // 创建管理员账户（可选字段为空时保持 null，由前端处理默认显示）
+        User admin = new User();
+        admin.setUsername(request.getUsername());
+        admin.setPassword(passwordEncoder.encode(request.getPassword()));
+        admin.setNickname(request.getNickname());
+        admin.setAvatar(request.getAvatar());
+        admin.setDescription(request.getDescription());
+        admin.setEmail(request.getEmail());
+        admin.setIsOwner(true);
+        admin.setIsDeleted(false);
+        userService.save(admin);
     }
 }

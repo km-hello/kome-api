@@ -1,9 +1,12 @@
 package com.kmo.kome.dto.response;
 
+import com.kmo.kome.dto.SocialLink;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 /**
  * 用户信息响应 DTO 类。
@@ -21,4 +24,5 @@ public class UserInfoResponse {
     private String avatar;
     private String email;
     private String description;
+    private List<SocialLink> socialLinks;
 }

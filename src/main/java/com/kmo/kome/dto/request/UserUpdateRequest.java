@@ -1,9 +1,12 @@
 package com.kmo.kome.dto.request;
 
+import com.kmo.kome.dto.SocialLink;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * 更新用户信息请求类。
@@ -28,4 +31,9 @@ public class UserUpdateRequest {
 
     @Size(max = 255, message = "个人简介不能超过255个字符")
     private String description;
+
+    /**
+     * 社交链接列表
+     */
+    private List<SocialLink> socialLinks;
 }

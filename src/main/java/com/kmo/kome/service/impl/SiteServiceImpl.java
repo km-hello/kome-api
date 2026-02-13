@@ -58,6 +58,7 @@ public class SiteServiceImpl implements SiteService {
                 .nickname(user.getNickname())
                 .avatar(user.getAvatar())
                 .description(user.getDescription())
+                .createdAt(user.getCreateTime())
                 .build();
 
         // 统计信息

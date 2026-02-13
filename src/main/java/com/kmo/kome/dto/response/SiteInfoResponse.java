@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 /**
  * 站点信息响应 DTO 类。
  * 用于封装站点的基本信息，包括所有者信息和统计数据，并返回给前端。
@@ -28,6 +30,7 @@ public class SiteInfoResponse {
         private String nickname;
         private String avatar;
         private String description;
+        private LocalDateTime createdAt;    // 站点创建时间（管理员账户创建时间）
     }
 
     // 内部类：站点统计信息

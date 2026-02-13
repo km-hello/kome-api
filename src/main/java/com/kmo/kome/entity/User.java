@@ -1,16 +1,19 @@
 package com.kmo.kome.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.kmo.kome.dto.SocialLink;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 用户实体类
  * 对应数据库表: user
  */
 @Data
-@TableName("user")
+@TableName(value = "user", autoResultMap = true)
 public class User {
     // 主键自增
     @TableId(type = IdType.AUTO)
@@ -25,6 +28,10 @@ public class User {
     private String avatar;
     private String email;
     private String description;
+
+    // 社交链接 JSON 数组
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<SocialLink> socialLinks;
 
     // 是否为站点所有者: 1=是，0=否, 默认 0
     private Boolean isOwner;

@@ -3,6 +3,7 @@ package com.kmo.kome.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.kmo.kome.common.ResultCode;
 import com.kmo.kome.common.exception.ServiceException;
+import com.kmo.kome.dto.SocialLink;
 import com.kmo.kome.dto.request.SetupRequest;
 import com.kmo.kome.dto.response.SiteInfoResponse;
 import com.kmo.kome.entity.Link;
@@ -13,6 +14,8 @@ import com.kmo.kome.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * 站点服务实现类
@@ -59,6 +62,7 @@ public class SiteServiceImpl implements SiteService {
                 .avatar(user.getAvatar())
                 .description(user.getDescription())
                 .createdAt(user.getCreateTime())
+                .socialLinks(user.getSocialLinks())
                 .build();
 
         // 统计信息
@@ -159,6 +163,15 @@ public class SiteServiceImpl implements SiteService {
         admin.setEmail(request.getEmail());
         admin.setIsOwner(true);
         admin.setIsDeleted(false);
+
+        // 设置默认社交链接
+        admin.setSocialLinks(List.of(
+                new SocialLink("github", "#"),
+                new SocialLink("twitter", "#"),
+                new SocialLink("email", "#"),
+                new SocialLink("website", "#")
+        ));
+
         userService.save(admin);
     }
 }

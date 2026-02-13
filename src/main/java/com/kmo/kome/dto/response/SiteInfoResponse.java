@@ -1,11 +1,13 @@
 package com.kmo.kome.dto.response;
 
+import com.kmo.kome.dto.SocialLink;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 站点信息响应 DTO 类。
@@ -31,6 +33,7 @@ public class SiteInfoResponse {
         private String avatar;
         private String description;
         private LocalDateTime createdAt;    // 站点创建时间（管理员账户创建时间）
+        private List<SocialLink> socialLinks;  // 社交链接列表
     }
 
     // 内部类：站点统计信息

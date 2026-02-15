@@ -50,7 +50,7 @@ jobs:
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha.substring(0, 7) }}
           cache-from: type=gha        # 从 GitHub Actions 缓存读取构建层
           cache-to: type=gha,mode=max  # 将所有构建层写入缓存，加速后续构建
 

@@ -36,14 +36,12 @@ jwt:
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml
 
-# API 文档配置（Swagger/OpenAPI）
+# API 文档配置（生产环境默认关闭，开发环境通过 application-dev.yaml 开启）
 springdoc:
   api-docs:
-    path: /api-docs
+    enabled: false
   swagger-ui:
-    path: /swagger-ui.html
-    tags-sorter: alpha
-    operations-sorter: alpha
+    enabled: false
 
 # 健康检查端点
 management:

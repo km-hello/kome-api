@@ -1,7 +1,8 @@
-# ==================== Docker 镜像自动构建与推送 ====================
+# ==================== Docker 镜像自动构建、推送与部署 ====================
 # 当代码合并到 main 分支时，自动构建 Docker 镜像并推送到 GitHub Container Registry (ghcr.io)
+# 推送完成后，SSH 到服务器拉取新镜像并重启对应容器
 
-name: Build and Push Docker Image
+name: Build, Push and Deploy
 
 # 触发条件：main 分支收到 push（包括 PR 合并）
 on:
@@ -12,6 +13,8 @@ on:
 env:
   REGISTRY: ghcr.io                      # GitHub 容器注册表地址
   IMAGE_NAME: ${{ github.repository }}   # 镜像名称，格式：用户名/仓库名
+  COMPOSE_DIR: /home/kongmeng/docker/kome-blog  # 服务器上 compose 文件所在目录
+  SERVICE_NAME: kome-api                 # 本项目对应的 compose 服务名
 
 jobs:
   build-and-push:
@@ -48,3 +51,23 @@ jobs:
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           cache-from: type=gha        # 从 GitHub Actions 缓存读取构建层
           cache-to: type=gha,mode=max  # 将所有构建层写入缓存，加速后续构建
+
+  # ==================== 部署到服务器 ====================
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-push  # 等待构建推送完成
+
+    steps:
+      # 5. SSH 到服务器，拉取新镜像并重启对应容器
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ${{ env.COMPOSE_DIR }}
+            sudo docker compose pull ${{ env.SERVICE_NAME }}
+            sudo docker compose up -d --remove-orphans ${{ env.SERVICE_NAME }}
+            sudo docker image prune -f

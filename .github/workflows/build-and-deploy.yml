@@ -42,7 +42,12 @@ jobs:
           username: ${{ github.actor }}          # 触发者的 GitHub 用户名
           password: ${{ secrets.GITHUB_TOKEN }}  # GitHub 自动提供的临时 token
 
-      # 4. 构建镜像并推送到 ghcr.io
+      # 4. 生成短 commit hash 用于镜像版本标签
+      - name: Generate short SHA
+        id: short-sha
+        run: echo "sha=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+      # 5. 构建镜像并推送到 ghcr.io
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
@@ -50,7 +55,7 @@ jobs:
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha.substring(0, 7) }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ steps.short-sha.outputs.sha }}
           cache-from: type=gha        # 从 GitHub Actions 缓存读取构建层
           cache-to: type=gha,mode=max  # 将所有构建层写入缓存，加速后续构建
 

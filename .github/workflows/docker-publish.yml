@@ -1,0 +1,50 @@
+# ==================== Docker 镜像自动构建与推送 ====================
+# 当代码合并到 main 分支时，自动构建 Docker 镜像并推送到 GitHub Container Registry (ghcr.io)
+
+name: Build and Push Docker Image
+
+# 触发条件：main 分支收到 push（包括 PR 合并）
+on:
+  push:
+    branches: [main]
+
+# 全局环境变量
+env:
+  REGISTRY: ghcr.io                      # GitHub 容器注册表地址
+  IMAGE_NAME: ${{ github.repository }}   # 镜像名称，格式：用户名/仓库名
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    # 权限配置：读取代码 + 推送镜像到 GitHub Packages
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      # 1. 拉取代码
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. 配置 Docker Buildx（支持多阶段构建和缓存）
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # 3. 登录 GitHub Container Registry
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}          # 触发者的 GitHub 用户名
+          password: ${{ secrets.GITHUB_TOKEN }}  # GitHub 自动提供的临时 token
+
+      # 4. 构建镜像并推送到 ghcr.io
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          cache-from: type=gha        # 从 GitHub Actions 缓存读取构建层
+          cache-to: type=gha,mode=max  # 将所有构建层写入缓存，加速后续构建

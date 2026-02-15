@@ -70,4 +70,3 @@ jobs:
             cd ${{ env.COMPOSE_DIR }}
             sudo docker compose pull ${{ env.SERVICE_NAME }}
             sudo docker compose up -d --remove-orphans ${{ env.SERVICE_NAME }}
-            sudo docker image prune -f

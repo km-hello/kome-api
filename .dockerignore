@@ -1,0 +1,22 @@
+# Git
+.git
+.gitignore
+
+# IDE
+.idea
+*.iml
+.vscode
+
+# Build output
+target/
+
+# Local config
+src/main/resources/application-dev.yaml
+
+# Documentation
+README.md
+HELP.md
+*.md
+
+# CI/CD
+.github/

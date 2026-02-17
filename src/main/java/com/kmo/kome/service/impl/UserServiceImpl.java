@@ -97,6 +97,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 .email(user.getEmail())
                 .description(user.getDescription())
                 .socialLinks(user.getSocialLinks())
+                .skills(user.getSkills())
                 .build();
     }
 

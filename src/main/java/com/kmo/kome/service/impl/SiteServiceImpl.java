@@ -63,6 +63,7 @@ public class SiteServiceImpl implements SiteService {
                 .description(user.getDescription())
                 .createdAt(user.getCreateTime())
                 .socialLinks(user.getSocialLinks())
+                .skills(user.getSkills())
                 .build();
 
         // 统计信息

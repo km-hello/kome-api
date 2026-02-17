@@ -1,8 +1,7 @@
 package com.kmo.kome.dto.request;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  *  Memo 查询请求类。
@@ -10,15 +9,8 @@ import lombok.Data;
  * 支持通过关键词和状态进行筛选，同时具备分页功能。
  */
 @Data
-public class MemoQueryRequest {
-    @NotNull(message = "页码不能为空")
-    @Min(value = 1, message = "页码最小为1")
-    private Integer pageNum = 1;
-
-    @NotNull(message = "每页数量不能为空")
-    @Min(value = 1, message = "每页数量最少为1")
-    private Integer pageSize = 10;
-
+@EqualsAndHashCode(callSuper = true)
+public class MemoQueryRequest extends BaseQueryRequest {
     // 关键词筛选
     private String keyword;
     // 按状态筛选

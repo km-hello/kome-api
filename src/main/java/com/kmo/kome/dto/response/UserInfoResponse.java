@@ -1,5 +1,6 @@
 package com.kmo.kome.dto.response;
 
+import com.kmo.kome.dto.SkillItem;
 import com.kmo.kome.dto.SocialLink;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,4 +26,5 @@ public class UserInfoResponse {
     private String email;
     private String description;
     private List<SocialLink> socialLinks;
+    private List<SkillItem> skills;
 }

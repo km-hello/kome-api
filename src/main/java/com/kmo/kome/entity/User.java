@@ -2,6 +2,7 @@ package com.kmo.kome.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.kmo.kome.dto.SkillItem;
 import com.kmo.kome.dto.SocialLink;
 import lombok.Data;
 
@@ -32,6 +33,10 @@ public class User {
     // 社交链接 JSON 数组
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<SocialLink> socialLinks;
+
+    // 技能列表 JSON 数组
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<SkillItem> skills;
 
     // 是否为站点所有者: 1=是，0=否, 默认 0
     private Boolean isOwner;

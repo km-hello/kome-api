@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   `is_owner` tinyint NOT NULL DEFAULT '0' COMMENT '是否为站点所有者: 0=否, 1=是',
   `is_deleted` tinyint NOT NULL DEFAULT '0' COMMENT '逻辑删除: 0=正常, 1=已删除',
   `social_links` json DEFAULT NULL COMMENT '社交链接 JSON 数组',
+  `skills` json DEFAULT NULL COMMENT '技能列表 JSON 数组',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
   PRIMARY KEY (`id`),

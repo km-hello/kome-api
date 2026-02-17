@@ -1,5 +1,6 @@
 package com.kmo.kome.dto.response;
 
+import com.kmo.kome.dto.SkillItem;
 import com.kmo.kome.dto.SocialLink;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,6 +35,7 @@ public class SiteInfoResponse {
         private String description;
         private LocalDateTime createdAt;    // 站点创建时间（管理员账户创建时间）
         private List<SocialLink> socialLinks;  // 社交链接列表
+        private List<SkillItem> skills;        // 技能列表
     }
 
     // 内部类：站点统计信息

@@ -2,6 +2,7 @@ package com.kmo.kome.controller;
 
 import com.kmo.kome.common.PageResult;
 import com.kmo.kome.common.Result;
+import com.kmo.kome.dto.request.PostArchiveQueryRequest;
 import com.kmo.kome.dto.request.PostCreateRequest;
 import com.kmo.kome.dto.request.PostQueryRequest;
 import com.kmo.kome.dto.request.PostUpdateRequest;
@@ -112,11 +113,11 @@ public class PostController {
      * 获取文章归档列表。
      * 根据传入的查询条件，返回按年份和月份归档的文章数据，包括每月的文章数量及简单信息。
      *
-     * @param request 查询文章的请求参数，包含分页信息、关键词、标签筛选及状态筛选等条件。
+     * @param request 查询文章的请求参数，包含关键词、标签筛选等条件（无分页参数）。
      * @return 包含文章归档数据的结果对象 {@code Result<List<PostArchiveResponse>>}。
      */
     @GetMapping("/api/posts/archive")
-    public Result<List<PostArchiveResponse>> getArchivePosts(@Valid PostQueryRequest request){
+    public Result<List<PostArchiveResponse>> getArchivePosts(PostArchiveQueryRequest request){
         return Result.success(postService.getArchivePosts(request));
     }
 }

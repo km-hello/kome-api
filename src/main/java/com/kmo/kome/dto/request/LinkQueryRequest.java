@@ -1,9 +1,7 @@
 package com.kmo.kome.dto.request;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-
+import lombok.EqualsAndHashCode;
 
 /**
  * 友链查询请求类。
@@ -11,15 +9,8 @@ import lombok.Data;
  * 仅支持通过关键词进行筛选操作。
  */
 @Data
-public class LinkQueryRequest {
-    @NotNull(message = "页码不能为空")
-    @Min(value = 1, message = "页码最小为1")
-    private Integer pageNum = 1;
-
-    @NotNull(message = "每页数量不能为空")
-    @Min(value = 1, message = "每页数量最少为1")
-    private Integer pageSize = 10;
-
+@EqualsAndHashCode(callSuper = true)
+public class LinkQueryRequest extends BaseQueryRequest {
     // 关键词筛选
     private String keyword;
     // 按状态筛选

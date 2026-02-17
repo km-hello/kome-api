@@ -8,6 +8,7 @@ import com.kmo.kome.common.PageResult;
 import com.kmo.kome.common.ResultCode;
 import com.kmo.kome.common.exception.ServiceException;
 import com.kmo.kome.dto.TagWhitPostIdDTO;
+import com.kmo.kome.dto.request.PostArchiveQueryRequest;
 import com.kmo.kome.dto.request.PostCreateRequest;
 import com.kmo.kome.dto.request.PostQueryRequest;
 import com.kmo.kome.dto.request.PostUpdateRequest;
@@ -223,17 +224,21 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
      * 获取文章归档信息。
      * 该方法按年份和月份对已发布的文章进行归档，返回按时间分组的文章数据。
      *
-     * @param request 文章查询请求对象，用于定义筛选条件，包括关键字、标签等过滤条件。
-     *                该方法内部会自动设置状态为已发布（status=1）并查询全部数据（pageSize=-1）。
+     * @param request 文章归档查询请求对象，用于定义筛选条件，包括关键字、标签等过滤条件。
      * @return 包含按年份和月份分组的文章归档列表。在没有符合条件的文章时，返回空列表。
      */
     @Override
-    public List<PostArchiveResponse> getArchivePosts(PostQueryRequest request) {
-        // 准备查询参数
-        request.setStatus(1); // 只查询已发布文章（status=1）
-        request.setPageSize(-1); // 查询全部数据（pageSize=-1，避免分页）
+    public List<PostArchiveResponse> getArchivePosts(PostArchiveQueryRequest request) {
+        // 内部构造分页查询请求，复用 getAdminPostPage
+        PostQueryRequest query = new PostQueryRequest();
+        query.setPageNum(1);
+        query.setPageSize(-1); // 设置不分页
+        query.setKeyword(request.getKeyword());
+        query.setTagId(request.getTagId());
+        query.setStatus(1); // 只查询已发布文章
+
         // 获取原始数据, 并按照创建时间倒叙排序
-        List<PostSimpleResponse> rawPosts = getAdminPostPage(request).getRecords().stream()
+        List<PostSimpleResponse> rawPosts = getAdminPostPage(query).getRecords().stream()
                 .sorted(Comparator.comparing(PostSimpleResponse::getCreateTime).reversed())
                 .toList();
         // 空数据直接返回空列表

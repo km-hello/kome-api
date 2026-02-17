@@ -3,6 +3,7 @@ package com.kmo.kome.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.kmo.kome.common.PageResult;
 import com.kmo.kome.dto.request.LinkCreateRequest;
+import com.kmo.kome.dto.request.LinkPublicQueryRequest;
 import com.kmo.kome.dto.request.LinkQueryRequest;
 import com.kmo.kome.dto.request.LinkUpdateRequest;
 import com.kmo.kome.dto.response.LinkResponse;
@@ -18,7 +19,7 @@ import java.util.List;
  * 主要用于管理和操作与友链实体相关的业务逻辑。
  */
 public interface LinkService extends IService<Link> {
-    List<LinkResponse> getPublicLinkList(@Valid LinkQueryRequest request);
+    List<LinkResponse> getPublicLinkList(LinkPublicQueryRequest request);
 
     Long createLink(@Valid LinkCreateRequest request);
 

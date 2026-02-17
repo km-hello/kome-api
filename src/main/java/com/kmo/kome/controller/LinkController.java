@@ -3,6 +3,7 @@ package com.kmo.kome.controller;
 import com.kmo.kome.common.PageResult;
 import com.kmo.kome.common.Result;
 import com.kmo.kome.dto.request.LinkCreateRequest;
+import com.kmo.kome.dto.request.LinkPublicQueryRequest;
 import com.kmo.kome.dto.request.LinkQueryRequest;
 import com.kmo.kome.dto.request.LinkUpdateRequest;
 import com.kmo.kome.dto.response.LinkResponse;
@@ -60,11 +61,11 @@ public class LinkController {
      * 获取公开的友情链接列表。
      * 根据查询参数筛选友链信息，并返回符合条件的公开友链列表。
      *
-     * @param request 友链查询请求对象，包含分页参数和关键词筛选条件。
+     * @param request 友链查询请求对象，包含关键词筛选条件（无分页参数）。
      * @return 包含公开友链信息的结果对象，数据为 {@code List<LinkResponse>} 类型。
      */
     @GetMapping("/api/links")
-    public Result<List<LinkResponse>> getPublicLinkList(@Valid LinkQueryRequest request){
+    public Result<List<LinkResponse>> getPublicLinkList(LinkPublicQueryRequest request){
         return Result.success(linkService.getPublicLinkList(request));
     }
 

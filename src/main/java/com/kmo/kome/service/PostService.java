@@ -2,6 +2,7 @@ package com.kmo.kome.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.kmo.kome.common.PageResult;
+import com.kmo.kome.dto.request.PostArchiveQueryRequest;
 import com.kmo.kome.dto.request.PostCreateRequest;
 import com.kmo.kome.dto.request.PostQueryRequest;
 import com.kmo.kome.dto.request.PostUpdateRequest;
@@ -34,6 +35,6 @@ public interface PostService extends IService<Post> {
 
     PageResult<PostSimpleResponse> getPublicPostPage(@Valid PostQueryRequest request);
 
-    List<PostArchiveResponse> getArchivePosts(@Valid PostQueryRequest request);
+    List<PostArchiveResponse> getArchivePosts(PostArchiveQueryRequest request);
 }
 

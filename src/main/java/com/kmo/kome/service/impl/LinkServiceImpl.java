@@ -7,6 +7,7 @@ import com.kmo.kome.common.PageResult;
 import com.kmo.kome.common.ResultCode;
 import com.kmo.kome.common.exception.ServiceException;
 import com.kmo.kome.dto.request.LinkCreateRequest;
+import com.kmo.kome.dto.request.LinkPublicQueryRequest;
 import com.kmo.kome.dto.request.LinkQueryRequest;
 import com.kmo.kome.dto.request.LinkUpdateRequest;
 import com.kmo.kome.dto.response.LinkResponse;
@@ -84,21 +85,20 @@ public class LinkServiceImpl extends ServiceImpl<LinkMapper, Link> implements Li
 
     /**
      * 获取所有公开友链的列表。
-     * 此方法会将请求中的分页设置为不分页，从而返回所有符合条件的友链列表。
+     * 内部构造分页查询请求，复用 getAdminLinkPage 返回全量数据。
      *
      * @param request 包含筛选条件的查询请求对象，其中：
-     *                - pageNum 表示当前页码（默认值为 1）；
-     *                - pageSize 表示每页数量（此处会被设置为 -1）；
      *                - keyword 是用于友链名称模糊查询的关键词（可选）。
      * @return 返回一个包含所有公开友链的列表，每个元素为 LinkResponse 类型的对象。
      */
     @Override
-    public List<LinkResponse> getPublicLinkList(LinkQueryRequest request) {
-        // 设置不分页
-        request.setPageSize(-1);
-        // 只查询公开的链接
-        request.setStatus(1);
-        return getAdminLinkPage(request).getRecords();
+    public List<LinkResponse> getPublicLinkList(LinkPublicQueryRequest request) {
+        LinkQueryRequest query = new LinkQueryRequest();
+        query.setPageNum(1);
+        query.setPageSize(-1); // 设置不分页
+        query.setKeyword(request.getKeyword());
+        query.setStatus(1); // 只查询公开的链接
+        return getAdminLinkPage(query).getRecords();
     }
 
     /**

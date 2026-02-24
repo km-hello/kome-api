@@ -52,3 +52,10 @@ management:
   endpoint:
     health:
       show-details: never
+
+# AI 配置（后端代理调用 OpenAI 兼容 API）
+ai:
+  api-key: ${AI_API_KEY:}
+  base-url: ${AI_BASE_URL:https://api.openai.com}
+  model: ${AI_MODEL:gpt-4o-mini}
+  timeout: ${AI_TIMEOUT:30}

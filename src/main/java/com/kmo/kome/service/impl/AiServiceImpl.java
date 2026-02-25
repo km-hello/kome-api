@@ -42,7 +42,7 @@ public class AiServiceImpl implements AiService {
     public String generateSummary(String content) {
         // 截断内容至 50000 字符，避免超出模型上下文限制
         String truncated = content.length() > 50000 ? content.substring(0, 50000) : content;
-        String systemPrompt = "为一篇技术博客文章生成中文摘要。风格参考少数派、阮一峰博客的文章描述：简洁清晰，有信息量。30-80字，只客观描述文章内容本身，不要出现'本文''读者''用户''帮助'等词，不要用疑问句，不要描述文章的目的或受众。只返回摘要文本。";
+        String systemPrompt = "为一篇技术博客文章生成中文摘要。风格参考少数派、阮一峰博客的文章描述：简洁清晰，有信息量。20-100字，只客观描述文章内容本身，不要出现'本文''读者''用户''帮助'等词，不要用疑问句，不要描述文章的目的或受众。只返回摘要文本。";
         return callChatApi(systemPrompt, truncated, 0.4);
     }
 
@@ -56,7 +56,7 @@ public class AiServiceImpl implements AiService {
      */
     @Override
     public String generateSlug(String title) {
-        String systemPrompt = "将标题转换为英文 URL slug。规则：小写+连字符，提炼标题核心含义（副标题、修饰语可省略），技术名词保留原文（如 react、docker），3-6个单词。只返回 slug。";
+        String systemPrompt = "将标题转换为英文 URL slug。规则：小写+连字符，提炼标题核心含义（副标题、修饰语可省略），技术名词保留原文（如 react、docker），尽量简短但保证意义完整，不超过80个字符。只返回 slug。";
         String raw = callChatApi(systemPrompt, title, 0.2);
         // 后处理确保 slug 格式合规
         return raw.toLowerCase()

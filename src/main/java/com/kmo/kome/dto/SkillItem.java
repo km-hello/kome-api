@@ -21,4 +21,9 @@ public class SkillItem {
      * 熟练程度: 1=Basic, 2=Familiar, 3=Proficient
      */
     private Integer level;
+
+    /**
+     * 显示排序（值越小越靠前）
+     */
+    private Integer order;
 }

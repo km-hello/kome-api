@@ -20,3 +20,6 @@ HELP.md
 
 # CI/CD
 .github/
+
+# Claude Code / OMC
+.omc/

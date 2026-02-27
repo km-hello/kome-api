@@ -1,5 +1,10 @@
 package com.kmo.kome.service;
 
+import com.kmo.kome.dto.request.AiSlugRequest;
+import com.kmo.kome.dto.request.AiSummaryRequest;
+import com.kmo.kome.dto.response.AiResultResponse;
+import jakarta.validation.Valid;
+
 /**
  * AI 服务接口。
  * <p>
@@ -11,16 +16,16 @@ public interface AiService {
     /**
      * 根据文章内容生成简短的中文摘要。
      *
-     * @param content 文章正文内容。
-     * @return 生成的摘要文本。
+     * @param request 包含文章正文内容的请求对象。
+     * @return 包含生成摘要的结果对象。
      */
-    String generateSummary(String content);
+    AiResultResponse generateSummary(@Valid AiSummaryRequest request);
 
     /**
      * 根据文章标题生成 SEO 友好的英文 URL Slug。
      *
-     * @param title 文章标题。
-     * @return 生成的 slug 文本。
+     * @param request 包含文章标题的请求对象。
+     * @return 包含生成 slug 的结果对象。
      */
-    String generateSlug(String title);
+    AiResultResponse generateSlug(@Valid AiSlugRequest request);
 }

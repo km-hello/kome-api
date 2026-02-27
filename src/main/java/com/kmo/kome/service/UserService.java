@@ -1,6 +1,7 @@
 package com.kmo.kome.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.kmo.kome.common.exception.ServiceException;
 import com.kmo.kome.dto.request.UserLoginRequest;
 import com.kmo.kome.dto.request.UserUpdatePasswordRequest;
 import com.kmo.kome.dto.request.UserUpdateRequest;

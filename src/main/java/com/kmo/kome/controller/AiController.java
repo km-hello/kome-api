@@ -9,7 +9,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
  * {@code .requestMatchers("/api/admin/**").authenticated()} 规则保护。
  */
 @RestController
-@RequestMapping("/api/admin/ai")
 @RequiredArgsConstructor
 public class AiController {
 
@@ -33,10 +31,9 @@ public class AiController {
      * @param request 包含文章内容的请求对象。
      * @return 包含生成摘要的结果对象。
      */
-    @PostMapping("/summary")
+    @PostMapping("/api/admin/ai/summary")
     public Result<AiResultResponse> generateSummary(@Valid @RequestBody AiSummaryRequest request) {
-        String summary = aiService.generateSummary(request.getContent());
-        return Result.success(new AiResultResponse(summary));
+        return Result.success(aiService.generateSummary(request));
     }
 
     /**
@@ -46,9 +43,8 @@ public class AiController {
      * @param request 包含文章标题的请求对象。
      * @return 包含生成 slug 的结果对象。
      */
-    @PostMapping("/slug")
+    @PostMapping("/api/admin/ai/slug")
     public Result<AiResultResponse> generateSlug(@Valid @RequestBody AiSlugRequest request) {
-        String slug = aiService.generateSlug(request.getTitle());
-        return Result.success(new AiResultResponse(slug));
+        return Result.success(aiService.generateSlug(request));
     }
 }

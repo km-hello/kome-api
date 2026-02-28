@@ -16,6 +16,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * 文章控制器。
+ * <p>
+ * 提供文章的增删改查、分页列表及归档查询的 API 端点。
+ */
 @RestController
 @RequiredArgsConstructor
 public class PostController {

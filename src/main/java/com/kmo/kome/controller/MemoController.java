@@ -14,6 +14,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * 动态（Memo）控制器。
+ * <p>
+ * 提供动态的增删改查、最新动态及统计数据的 API 端点。
+ */
 @RestController
 @RequiredArgsConstructor
 public class MemoController {

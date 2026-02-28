@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * 站点控制器。
+ * <p>
+ * 提供站点信息获取、初始化状态检查及首次设置的 API 端点。
+ */
 @RestController
 @RequiredArgsConstructor
 public class SiteController {

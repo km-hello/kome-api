@@ -14,6 +14,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * 友情链接控制器。
+ * <p>
+ * 提供友链的增删改查及公开列表查询的 API 端点。
+ */
 @RestController
 @RequiredArgsConstructor
 public class LinkController {

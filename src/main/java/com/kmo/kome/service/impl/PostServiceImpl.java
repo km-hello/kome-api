@@ -35,6 +35,12 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * 文章服务实现类。
+ * <p>
+ * 实现文章的创建、更新、删除、详情查询、分页列表及归档等核心业务逻辑，
+ * 包含 Slug 唯一性校验、标签关联管理及浏览量原子递增等功能。
+ */
 @Service
 @RequiredArgsConstructor
 public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements PostService {

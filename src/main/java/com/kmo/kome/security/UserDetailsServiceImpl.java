@@ -5,6 +5,8 @@ import com.kmo.kome.entity.User;
 import com.kmo.kome.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -22,6 +24,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
     private ApplicationContext applicationContext;
+
+    @Autowired
+    private MessageSource messageSource;
 
 
     /**
@@ -57,7 +62,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         // 2. 检查用户是否存在
         if (user == null) {
             // 默认情况下 Spring Security 会将此异常转换为 BadCredentialsException (为了安全，防枚举)
-            throw new UsernameNotFoundException("用户不存在");
+            // 使用 i18n 消息，通过 LocaleContextHolder 获取当前语言环境
+            throw new UsernameNotFoundException(
+                    messageSource.getMessage("error.user.notFound", null, LocaleContextHolder.getLocale()));
         }
 
         // 3. 转换自定义的 CustomUserDetails 对象

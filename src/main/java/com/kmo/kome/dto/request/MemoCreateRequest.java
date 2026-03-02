@@ -12,13 +12,13 @@ import org.hibernate.validator.constraints.Range;
  */
 @Data
 public class MemoCreateRequest {
-    @NotBlank(message = "内容不能为空")
+    @NotBlank(message = "{validation.memo.content.notBlank}")
     private String content;
 
-    @NotNull(message = "置顶状态不能为空")
+    @NotNull(message = "{validation.memo.isPinned.notNull}")
     private Boolean isPinned = false;
 
-    @NotNull(message = "Memo状态不能为空")
-    @Range(min = 0, max = 1, message = "状态只能是 0 或 1")
+    @NotNull(message = "{validation.memo.status.notNull}")
+    @Range(min = 0, max = 1, message = "{validation.memo.status.range}")
     private Integer status = 0;
 }

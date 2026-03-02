@@ -9,6 +9,6 @@ import lombok.Data;
  */
 @Data
 public class AiSummaryRequest {
-    @NotBlank(message = "文章内容不能为空")
+    @NotBlank(message = "{validation.ai.content.notBlank}")
     private String content;
 }

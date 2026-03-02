@@ -16,21 +16,21 @@ import java.util.List;
  */
 @Data
 public class UserUpdateRequest {
-    @Size(min = 4, max = 50, message = "用户名长度必须在4-50字符之间")
-    @Pattern(regexp = "^[a-zA-Z0-9_-]+$", message = "用户名只能包含字母、数字、下划线和减号")
+    @Size(min = 4, max = 50, message = "{validation.user.username.sizeUpdate}")
+    @Pattern(regexp = "^[a-zA-Z0-9_-]+$", message = "{validation.user.username.pattern}")
     private String username;
 
-    @Size(max = 50, message = "昵称不能超过50个字符")
+    @Size(max = 50, message = "{validation.user.nickname.size}")
     private String nickname;
 
-    @Size(max = 255, message = "头像链接过长")
+    @Size(max = 255, message = "{validation.user.avatar.size}")
     private String avatar;
 
-    @Size(max = 100, message = "邮箱长度不能超过100")
-    @Email(message = "邮箱格式不正确")
+    @Size(max = 100, message = "{validation.user.email.size}")
+    @Email(message = "{validation.user.email.format}")
     private String email;
 
-    @Size(max = 255, message = "个人简介不能超过255个字符")
+    @Size(max = 255, message = "{validation.user.description.size}")
     private String description;
 
     /**

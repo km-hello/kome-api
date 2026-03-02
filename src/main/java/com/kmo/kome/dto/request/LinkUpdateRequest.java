@@ -11,18 +11,18 @@ import org.hibernate.validator.constraints.Range;
  */
 @Data
 public class LinkUpdateRequest {
-    @Size(min = 1, max = 100, message = "友链名称不能超过100个字符, 且不能为空")
+    @Size(min = 1, max = 100, message = "{validation.link.name.sizeUpdate}")
     private String name;
 
-    @Size(max = 255, message = "友链URL长度不能超过255")
+    @Size(max = 255, message = "{validation.link.url.size}")
     private String url;
 
-    @Size(max = 255, message = "友链头像链接长度不能超过255")
+    @Size(max = 255, message = "{validation.link.avatar.size}")
     private String avatar;
 
-    @Size(max = 255, message = "友链描述不能超过255个字符")
+    @Size(max = 255, message = "{validation.link.description.size}")
     private String description;
 
-    @Range(min = 0, max = 1, message = "状态只能是 0 或 1")
+    @Range(min = 0, max = 1, message = "{validation.link.status.range}")
     private Integer status;
 }

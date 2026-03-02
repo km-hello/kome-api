@@ -10,11 +10,11 @@ import lombok.Data;
  */
 @Data
 public class UserLoginRequest {
-    @NotBlank(message = "用户名/邮箱不能为空")
-    @Size(max = 50, message = "用户名/邮箱过长")
+    @NotBlank(message = "{validation.user.usernameLogin.notBlank}")
+    @Size(max = 50, message = "{validation.user.usernameLogin.size}")
     private String username;
 
-    @NotBlank(message = "密码不能为空")
-    @Size(max = 100, message = "密码过长")
+    @NotBlank(message = "{validation.user.passwordLogin.notBlank}")
+    @Size(max = 100, message = "{validation.user.passwordLogin.size}")
     private String password;
 }

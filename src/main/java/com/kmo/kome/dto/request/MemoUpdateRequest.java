@@ -11,11 +11,11 @@ import org.hibernate.validator.constraints.Range;
  */
 @Data
 public class MemoUpdateRequest {
-    @Size(min = 1, message = "Memo内容不能为空")
+    @Size(min = 1, message = "{validation.memo.content.size}")
     private String content;
 
     private Boolean isPinned;
 
-    @Range(min = 0, max = 1, message = "状态只能是 0 或 1")
+    @Range(min = 0, max = 1, message = "{validation.memo.status.range}")
     private Integer status;
 }

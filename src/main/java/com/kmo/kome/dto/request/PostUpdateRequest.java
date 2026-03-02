@@ -15,26 +15,26 @@ import java.util.List;
  */
 @Data
 public class PostUpdateRequest {
-    @Size(min = 1, max = 255, message = "文章标题不能超过255个字符，且不能为空")
+    @Size(min = 1, max = 255, message = "{validation.post.title.sizeUpdate}")
     private String title;
 
-    @Size(max = 255, message = "文章别名不能超过255个字符")
-    @Pattern(regexp = "^[a-z0-9]+(?:-[a-z0-9]+)*$", message = "文章别名格式不正确")
+    @Size(max = 255, message = "{validation.post.slug.size}")
+    @Pattern(regexp = "^[a-z0-9]+(?:-[a-z0-9]+)*$", message = "{validation.post.slug.pattern}")
     private String slug;
 
-    @Size(max = 500, message = "文章摘要不能超过500个字符")
+    @Size(max = 500, message = "{validation.post.summary.size}")
     private String summary;
 
-    @Size(min = 1, message = "文章内容不能为空")
+    @Size(min = 1, message = "{validation.post.content.size}")
     private String content;
 
-    @Size(max = 255, message = "封面链接长度不能超过255")
+    @Size(max = 255, message = "{validation.post.coverImage.size}")
     private String coverImage;
 
     // 是否置顶
     private Boolean isPinned;
 
-    @Range(min = 0, max = 1, message = "状态只能是 0 或 1")
+    @Range(min = 0, max = 1, message = "{validation.post.status.range}")
     private Integer status;
 
     // 标签列表

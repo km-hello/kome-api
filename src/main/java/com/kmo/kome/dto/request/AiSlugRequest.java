@@ -10,7 +10,7 @@ import lombok.Data;
  */
 @Data
 public class AiSlugRequest {
-    @NotBlank(message = "文章标题不能为空")
-    @Size(max = 255, message = "文章标题过长")
+    @NotBlank(message = "{validation.ai.title.notBlank}")
+    @Size(max = 255, message = "{validation.ai.title.size}")
     private String title;
 }

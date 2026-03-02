@@ -10,11 +10,11 @@ import lombok.Data;
  */
 @Data
 public class BaseQueryRequest {
-    @NotNull(message = "页码不能为空")
-    @Min(value = 1, message = "页码最小为1")
+    @NotNull(message = "{validation.query.pageNum.notNull}")
+    @Min(value = 1, message = "{validation.query.pageNum.min}")
     private Integer pageNum = 1;
 
-    @NotNull(message = "每页数量不能为空")
-    @Min(value = 1, message = "每页数量最少为1")
+    @NotNull(message = "{validation.query.pageSize.notNull}")
+    @Min(value = 1, message = "{validation.query.pageSize.min}")
     private Integer pageSize = 10;
 }

@@ -8,6 +8,7 @@ import com.kmo.kome.dto.request.AiSlugRequest;
 import com.kmo.kome.dto.request.AiSummaryRequest;
 import com.kmo.kome.dto.response.AiResultResponse;
 import com.kmo.kome.service.AiService;
+import com.kmo.kome.utils.MessageHelper;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,7 @@ public class AiServiceImpl implements AiService {
 
     private final WebClient aiWebClient;
     private final AiConfig aiConfig;
+    private final MessageHelper messageHelper;
 
     // ==================== OpenAI 响应结构 ====================
     @Data
@@ -131,13 +133,13 @@ public class AiServiceImpl implements AiService {
 
             // 3. 校验响应结构：确保 choices 列表非空
             if (response == null || response.getChoices() == null || response.getChoices().isEmpty()) {
-                throw new ServiceException(ResultCode.INTERNAL_SERVER_ERROR, "AI 服务返回结果为空");
+                throw new ServiceException(ResultCode.INTERNAL_SERVER_ERROR, messageHelper.get("error.ai.emptyResult"));
             }
 
             // 4. 提取第一个 choice 中的消息内容并校验非空
             String content = response.getChoices().getFirst().getMessage().getContent();
             if (content == null || content.isBlank()) {
-                throw new ServiceException(ResultCode.INTERNAL_SERVER_ERROR, "AI 服务返回结果为空");
+                throw new ServiceException(ResultCode.INTERNAL_SERVER_ERROR, messageHelper.get("error.ai.emptyResult"));
             }
 
             return content.trim();
@@ -146,8 +148,8 @@ public class AiServiceImpl implements AiService {
             throw e;
         } catch (Exception e) {
             // 5b. 其他异常（超时、连接拒绝、JSON 解析失败等）统一转换为用户友好的业务异常
-            log.error("调用 AI 服务失败", e);
-            throw new ServiceException(ResultCode.INTERNAL_SERVER_ERROR, "AI 服务暂时不可用");
+            log.error("AI service call failed", e);
+            throw new ServiceException(ResultCode.INTERNAL_SERVER_ERROR, messageHelper.get("error.ai.unavailable"));
         }
     }
 }

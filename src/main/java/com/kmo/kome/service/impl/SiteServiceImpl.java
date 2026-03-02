@@ -11,6 +11,7 @@ import com.kmo.kome.entity.Memo;
 import com.kmo.kome.entity.Post;
 import com.kmo.kome.entity.User;
 import com.kmo.kome.service.*;
+import com.kmo.kome.utils.MessageHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,7 @@ public class SiteServiceImpl implements SiteService {
     private final MemoService memoService;
     private final LinkService linkService;
     private final PasswordEncoder passwordEncoder;
+    private final MessageHelper messageHelper;
 
     /**
      * 获取站点管理员的基础信息和统计数据。
@@ -54,7 +56,7 @@ public class SiteServiceImpl implements SiteService {
                 .last("LIMIT 1")
         );
         if(user == null){
-            throw new ServiceException(ResultCode.INTERNAL_SERVER_ERROR, "系统数据缺失");
+            throw new ServiceException(ResultCode.INTERNAL_SERVER_ERROR, messageHelper.get("error.site.dataMissing"));
         }
 
         SiteInfoResponse.OwnerInfo ownerInfo = SiteInfoResponse.OwnerInfo.builder()
@@ -151,7 +153,7 @@ public class SiteServiceImpl implements SiteService {
     public void setupAdmin(SetupRequest request) {
         // 检查是否已初始化
         if (isInitialized()) {
-            throw new ServiceException(ResultCode.BAD_REQUEST, "系统已初始化");
+            throw new ServiceException(ResultCode.BAD_REQUEST, messageHelper.get("error.site.alreadyInitialized"));
         }
 
         // 创建管理员账户

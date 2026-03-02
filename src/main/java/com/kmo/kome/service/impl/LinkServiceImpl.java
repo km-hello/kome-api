@@ -14,6 +14,8 @@ import com.kmo.kome.dto.response.LinkResponse;
 import com.kmo.kome.entity.Link;
 import com.kmo.kome.mapper.LinkMapper;
 import com.kmo.kome.service.LinkService;
+import com.kmo.kome.utils.MessageHelper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -27,7 +29,10 @@ import java.util.List;
  * 可在此基础上扩展和实现更复杂的业务逻辑。
  */
 @Service
+@RequiredArgsConstructor
 public class LinkServiceImpl extends ServiceImpl<LinkMapper, Link> implements LinkService {
+
+    private final MessageHelper messageHelper;
 
     /**
      * 创建新友链并保存到数据库中。
@@ -57,7 +62,7 @@ public class LinkServiceImpl extends ServiceImpl<LinkMapper, Link> implements Li
     public Void updateLinkById(Long id, LinkUpdateRequest request) {
         Link link = getById(id);
         if(link == null){
-            throw new ServiceException(ResultCode.NOT_FOUND, "友链不存在");
+            throw new ServiceException(ResultCode.NOT_FOUND, messageHelper.get("error.link.notFound"));
         }
         Link updateLink = new Link();
         BeanUtils.copyProperties(request, updateLink);
@@ -77,7 +82,7 @@ public class LinkServiceImpl extends ServiceImpl<LinkMapper, Link> implements Li
     public Void deleteLinkById(Long id) {
         Link link = getById(id);
         if(link == null){
-            throw new ServiceException(ResultCode.NOT_FOUND, "友链不存在");
+            throw new ServiceException(ResultCode.NOT_FOUND, messageHelper.get("error.link.notFound"));
         }
         removeById(id);
         return null;

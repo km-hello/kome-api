@@ -16,6 +16,7 @@ import com.kmo.kome.entity.Tag;
 import com.kmo.kome.mapper.TagMapper;
 import com.kmo.kome.service.PostTagService;
 import com.kmo.kome.service.TagService;
+import com.kmo.kome.utils.MessageHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +32,7 @@ import java.util.List;
 public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagService {
 
     private final PostTagService postTagService;
+    private final MessageHelper messageHelper;
 
 
     /**
@@ -47,7 +49,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
                 new LambdaQueryWrapper<Tag>().eq(Tag::getName, name)
         );
         if (tag != null) {
-            throw new ServiceException(ResultCode.BAD_REQUEST, "标签已存在");
+            throw new ServiceException(ResultCode.BAD_REQUEST, messageHelper.get("error.tag.alreadyExists"));
         }
 
         // 创建新标签
@@ -71,7 +73,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
         // 检查标签是否存在
         Tag oldTag = getById(id);
         if (oldTag == null) {
-            throw new ServiceException(ResultCode.NOT_FOUND, "标签不存在");
+            throw new ServiceException(ResultCode.NOT_FOUND, messageHelper.get("error.tag.notFound"));
         }
 
         // 检查新标签名是否被占用
@@ -80,7 +82,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
                 .ne(Tag::getId, id)
                 .exists();
         if (isTagNameTaken) {
-            throw new ServiceException(ResultCode.BAD_REQUEST, "标签名称已被占用");
+            throw new ServiceException(ResultCode.BAD_REQUEST, messageHelper.get("error.tag.nameTaken"));
         }
 
         // 更新标签名称
@@ -107,7 +109,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
         // 检查标签是否存在
         Tag tag = getById(id);
         if (tag == null) {
-            throw new ServiceException(ResultCode.NOT_FOUND, "标签不存在");
+            throw new ServiceException(ResultCode.NOT_FOUND, messageHelper.get("error.tag.notFound"));
         }
 
         // 检查标签是否在使用中
@@ -115,8 +117,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
                 new LambdaQueryWrapper<PostTag>().eq(PostTag::getTagId, id)
         );
         if (postCount > 0) {
-            String errorMessage = String.format("无法删除标签 '%s'，有 %d 篇文章正在使用它。", tag.getName(), postCount);
-            throw new ServiceException(ResultCode.FORBIDDEN, errorMessage);
+            throw new ServiceException(ResultCode.FORBIDDEN, messageHelper.get("error.tag.inUse", tag.getName(), postCount));
         }
         // 删除标签
         removeById(id);

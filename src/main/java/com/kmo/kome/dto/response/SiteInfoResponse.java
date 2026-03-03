@@ -50,8 +50,8 @@ public class SiteInfoResponse {
         private Long usedTagCount;          // 使用中的标签数（有关联已发布文章的）
         private Long unusedTagCount;        // 未使用的标签数（没有关联已发布文章的）
 
-        private Long publishedMemoCount;    // 已发布的说说数
-        private Long draftMemoCount;        // 草稿说说数
+        private Long publishedMemoCount;    // 已发布的动态数
+        private Long draftMemoCount;        // 草稿动态数
 
         private Long publishedLinkCount;    // 已发布的友链数
         private Long draftLinkCount;        // 草稿友链数

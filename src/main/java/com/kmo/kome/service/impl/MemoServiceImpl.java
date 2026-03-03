@@ -14,6 +14,8 @@ import com.kmo.kome.dto.response.MemoStatsResponse;
 import com.kmo.kome.entity.Memo;
 import com.kmo.kome.mapper.MemoMapper;
 import com.kmo.kome.service.MemoService;
+import com.kmo.kome.utils.MessageHelper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -27,7 +29,10 @@ import java.util.List;
  * 提供了与 Memo 相关的业务逻辑和数据操作，并通过继承父类实现了基础的 CRUD 功能。
  */
 @Service
+@RequiredArgsConstructor
 public class MemoServiceImpl extends ServiceImpl<MemoMapper, Memo> implements MemoService {
+
+    private final MessageHelper messageHelper;
 
     /**
      * 创建一条新的 Memo 记录。
@@ -58,7 +63,7 @@ public class MemoServiceImpl extends ServiceImpl<MemoMapper, Memo> implements Me
     public Void updateMemoById(Long id, MemoUpdateRequest request) {
         Memo memo = getById(id);
         if(memo == null){
-            throw new ServiceException(ResultCode.NOT_FOUND, "Memo 不存在");
+            throw new ServiceException(ResultCode.NOT_FOUND, messageHelper.get("error.memo.notFound"));
         }
         Memo updateMemo = new Memo();
         BeanUtils.copyProperties(request, updateMemo);
@@ -80,7 +85,7 @@ public class MemoServiceImpl extends ServiceImpl<MemoMapper, Memo> implements Me
     public Void deleteMemoById(Long id) {
         Memo memo = getById(id);
         if(memo == null){
-            throw new ServiceException(ResultCode.NOT_FOUND, "Memo 不存在");
+            throw new ServiceException(ResultCode.NOT_FOUND, messageHelper.get("error.memo.notFound"));
         }
         removeById(id);
         return null;

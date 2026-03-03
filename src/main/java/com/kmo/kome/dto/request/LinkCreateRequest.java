@@ -13,22 +13,22 @@ import org.hibernate.validator.constraints.Range;
  */
 @Data
 public class LinkCreateRequest {
-    @NotBlank(message = "友链名称不能为空")
-    @Size(max = 100, message = "友链名称不能超过100个字符")
+    @NotBlank(message = "{validation.link.name.notBlank}")
+    @Size(max = 100, message = "{validation.link.name.size}")
     private String name;
 
-    @NotBlank(message = "友链URL不能为空")
-    @Size(max = 255, message = "友链URL长度不能超过255")
+    @NotBlank(message = "{validation.link.url.notBlank}")
+    @Size(max = 255, message = "{validation.link.url.size}")
     private String url;
 
-    @Size(max = 255, message = "友链头像链接长度不能超过255")
+    @Size(max = 255, message = "{validation.link.avatar.size}")
     private String avatar;
 
-    @Size(max = 255, message = "友链描述不能超过255个字符")
+    @Size(max = 255, message = "{validation.link.description.size}")
     private String description;
 
     // 状态: 1=公开, 0=隐藏, 默认 0
-    @NotNull(message = "友链状态不能为空")
-    @Range(min = 0, max = 1, message = "状态只能是 0 或 1")
+    @NotNull(message = "{validation.link.status.notNull}")
+    @Range(min = 0, max = 1, message = "{validation.link.status.range}")
     private Integer status = 0;
 }

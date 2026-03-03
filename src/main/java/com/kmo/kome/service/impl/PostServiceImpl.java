@@ -24,6 +24,7 @@ import com.kmo.kome.mapper.PostMapper;
 import com.kmo.kome.service.PostService;
 import com.kmo.kome.service.PostTagService;
 import com.kmo.kome.service.TagService;
+import com.kmo.kome.utils.MessageHelper;
 import com.kmo.kome.utils.PostUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -48,6 +49,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
     private final PostTagService postTagService;
     private final TagService tagService;
     private final PostUtils postUtils;
+    private final MessageHelper messageHelper;
 
     /**
      * 创建新文章。
@@ -96,7 +98,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
         // 检查 post 是否存在
         Post post = getById(id);
         if(post == null){
-            throw new ServiceException(ResultCode.NOT_FOUND, "文章不存在");
+            throw new ServiceException(ResultCode.NOT_FOUND, messageHelper.get("error.post.notFound"));
         }
 
         // 删除 post_tag 关联表中的相关记录
@@ -133,7 +135,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
         // 检查文章是否存在
         Post oldPost = getById(id);
         if(oldPost == null){
-            throw new ServiceException(ResultCode.NOT_FOUND, "文章不存在");
+            throw new ServiceException(ResultCode.NOT_FOUND, messageHelper.get("error.post.notFound"));
         }
 
         // 检查别名是否被占用
@@ -169,7 +171,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
         // 根据 id 查询文章
         Post post = getById(id);
         if(post == null){
-            throw new ServiceException(ResultCode.NOT_FOUND, "文章不存在");
+            throw new ServiceException(ResultCode.NOT_FOUND, messageHelper.get("error.post.notFound"));
         }
 
         // 后台接口不增加阅读量
@@ -194,7 +196,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
                 .one();
         // 检查文章是否存在并且已发布
         if(post == null || post.getStatus() == 0){
-            throw new ServiceException(ResultCode.NOT_FOUND, "文章不存在或未发布");
+            throw new ServiceException(ResultCode.NOT_FOUND, messageHelper.get("error.post.notFoundOrUnpublished"));
         }
 
         // 增加阅读量逻辑（原子递增，避免并发问题）
@@ -441,7 +443,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
         boolean isSlugTaken = exists(queryWrapper);
 
         if(slug != null && isSlugTaken){
-            throw new ServiceException(ResultCode.BAD_REQUEST, "文章别名已被占用");
+            throw new ServiceException(ResultCode.BAD_REQUEST, messageHelper.get("error.post.slugTaken"));
         }
     }
 
@@ -470,7 +472,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
 
         // 3. 对比：如果查出来的数量 ！= 请求的数量，说明有 ID 不存在
         if(count != distinctTagIds.size()){
-            throw new ServiceException(ResultCode.BAD_REQUEST, "包含不存在的标签");
+            throw new ServiceException(ResultCode.BAD_REQUEST, messageHelper.get("error.post.invalidTags"));
         }
     }
 

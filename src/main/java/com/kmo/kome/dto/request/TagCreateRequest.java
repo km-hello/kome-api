@@ -11,7 +11,7 @@ import lombok.Data;
  */
 @Data
 public class TagCreateRequest {
-    @NotBlank(message = "标签名称不能为空")
-    @Size(max = 50, message = "标签名称不能超过50个字符")
+    @NotBlank(message = "{validation.tag.name.notBlank}")
+    @Size(max = 50, message = "{validation.tag.name.size}")
     private String name;
 }

@@ -14,6 +14,7 @@ import com.kmo.kome.mapper.UserMapper;
 import com.kmo.kome.security.CustomUserDetails;
 import com.kmo.kome.service.UserService;
 import com.kmo.kome.utils.JwtUtils;
+import com.kmo.kome.utils.MessageHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +38,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
+    private final MessageHelper messageHelper;
 
     // 过期时间 (毫秒)
     @Value("${jwt.expiration}")
@@ -128,7 +130,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                     .ne(User::getId, user.getId())
                     .exists();
             if(isUsernameTaken){
-                throw new ServiceException(ResultCode.BAD_REQUEST, "用户名已被占用");
+                throw new ServiceException(ResultCode.BAD_REQUEST, messageHelper.get("error.user.usernameTaken"));
             }
         }
 
@@ -140,7 +142,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                     .ne(User::getId, user.getId())
                     .exists();
             if(isEmailTaken){
-                throw new ServiceException(ResultCode.BAD_REQUEST, "邮箱已被占用");
+                throw new ServiceException(ResultCode.BAD_REQUEST, messageHelper.get("error.user.emailTaken"));
             }
         }
 
@@ -178,12 +180,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User user = checkAndGetUser(currentUserId);
         // 验证旧密码是否正确
         if(!passwordEncoder.matches(request.getOldPassword(), user.getPassword())){
-            throw new ServiceException(ResultCode.BAD_REQUEST,"旧密码错误");
+            throw new ServiceException(ResultCode.BAD_REQUEST, messageHelper.get("error.user.wrongOldPassword"));
         }
 
         // 检查新旧密码是否相同
         if(request.getNewPassword().equals(request.getOldPassword())){
-            throw new ServiceException(ResultCode.BAD_REQUEST, "新密码不能与旧密码相同");
+            throw new ServiceException(ResultCode.BAD_REQUEST, messageHelper.get("error.user.samePassword"));
         }
 
         // 新密码加密
@@ -207,13 +209,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private User checkAndGetUser(Long currentUserId) {
         // 前置检查
         if(currentUserId == null){
-            throw new ServiceException(ResultCode.UNAUTHORIZED, "无效的身份凭证");
+            throw new ServiceException(ResultCode.UNAUTHORIZED, messageHelper.get("error.user.invalidCredentials"));
         }
 
         // 检查用户是否存在
         User user = getById(currentUserId);
         if(user == null){
-            throw new ServiceException(ResultCode.UNAUTHORIZED, "用户不存在或已注销");
+            throw new ServiceException(ResultCode.UNAUTHORIZED, messageHelper.get("error.user.notFound"));
         }
         return user;
     }

@@ -12,26 +12,26 @@ import lombok.Data;
  */
 @Data
 public class SetupRequest {
-    @NotBlank(message = "用户名不能为空")
-    @Size(min = 4, max = 50, message = "用户名长度需在4-50之间")
-    @Pattern(regexp = "^[a-zA-Z0-9_-]+$", message = "用户名只能包含字母、数字、下划线和减号")
+    @NotBlank(message = "{validation.user.username.notBlank}")
+    @Size(min = 4, max = 50, message = "{validation.user.username.size}")
+    @Pattern(regexp = "^[a-zA-Z0-9_-]+$", message = "{validation.user.username.pattern}")
     private String username;
 
-    @NotBlank(message = "密码不能为空")
+    @NotBlank(message = "{validation.user.password.notBlank}")
     @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[\\W_]).{8,64}$",
-            message = "密码需包含字母、数字和特殊字符，长度8-64")
+            message = "{validation.user.password.pattern}")
     private String password;
 
-    @Size(max = 50, message = "昵称长度不能超过50")
+    @Size(max = 50, message = "{validation.user.nickname.size}")
     private String nickname;
 
-    @Size(max = 255, message = "头像URL长度不能超过255")
+    @Size(max = 255, message = "{validation.user.avatar.size}")
     private String avatar;
 
-    @Size(max = 255, message = "个人简介长度不能超过255")
+    @Size(max = 255, message = "{validation.user.description.size}")
     private String description;
 
-    @Email(message = "邮箱格式不正确")
+    @Email(message = "{validation.user.email.format}")
     @Size(max = 100)
     private String email;
 }

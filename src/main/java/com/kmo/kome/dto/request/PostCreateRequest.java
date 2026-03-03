@@ -18,30 +18,30 @@ import java.util.List;
  */
 @Data
 public class PostCreateRequest {
-    @NotBlank(message = "文章标题不能为空")
-    @Size(max = 255, message = "文章标题不能超过255个字符")
+    @NotBlank(message = "{validation.post.title.notBlank}")
+    @Size(max = 255, message = "{validation.post.title.size}")
     private String title;
 
-    @NotBlank(message = "文章别名不能为空")
-    @Size(max = 255, message = "文章别名不能超过255个字符")
-    @Pattern(regexp = "^[a-z0-9]+(?:-[a-z0-9]+)*$", message = "文章别名格式不正确")
+    @NotBlank(message = "{validation.post.slug.notBlank}")
+    @Size(max = 255, message = "{validation.post.slug.size}")
+    @Pattern(regexp = "^[a-z0-9]+(?:-[a-z0-9]+)*$", message = "{validation.post.slug.pattern}")
     private String slug;
 
-    @Size(max = 500, message = "文章摘要不能超过500个字符")
+    @Size(max = 500, message = "{validation.post.summary.size}")
     private String summary;
 
-    @NotBlank(message = "文章内容不能为空")
+    @NotBlank(message = "{validation.post.content.notBlank}")
     private String content;
 
-    @Size(max = 255, message = "封面链接长度不能超过255")
+    @Size(max = 255, message = "{validation.post.coverImage.size}")
     private String coverImage;
 
-    @NotNull(message = "置顶状态不能为空")
+    @NotNull(message = "{validation.post.isPinned.notNull}")
     private Boolean isPinned = false;
 
     // 状态: 1=已发布, 0=草稿, 默认 0
-    @NotNull(message = "文章状态不能为空")
-    @Range(min = 0, max = 1, message = "状态只能是 0 或 1")
+    @NotNull(message = "{validation.post.status.notNull}")
+    @Range(min = 0, max = 1, message = "{validation.post.status.range}")
     private Integer status = 0;
 
     // 标签列表

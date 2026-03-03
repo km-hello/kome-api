@@ -12,9 +12,9 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface MemoMapper extends BaseMapper<Memo> {
     /**
-     * 查询说说（Memo）的统计数据，汇总总数量、总字数、本月新增数量以及最新发布时间等信息。
+     * 查询动态（Memo）的统计数据，汇总总数量、总字数、本月新增数量以及最新发布时间等信息。
      *
-     * @return 包含说说统计信息的 {@code MemoStatsResponse} 对象
+     * @return 包含动态统计信息的 {@code MemoStatsResponse} 对象
      */
     MemoStatsResponse selectMemoStats();
 }

@@ -13,7 +13,7 @@ public class PasswordTest {
         String result = encoder.encode("123456");
 
         System.out.println("=========================================");
-        System.out.println("下面是加密后的 password:");
+        System.out.println("Encoded password:");
         System.out.println(result);
         System.out.println("=========================================");
     }

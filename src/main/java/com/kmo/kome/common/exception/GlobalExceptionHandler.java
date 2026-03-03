@@ -2,6 +2,8 @@ package com.kmo.kome.common.exception;
 
 import com.kmo.kome.common.Result;
 import com.kmo.kome.common.ResultCode;
+import com.kmo.kome.utils.MessageHelper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +28,10 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
  */
 @Slf4j
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
+
+    private final MessageHelper messageHelper;
 
     /**
      * 处理业务异常的方法。当捕获到 {@code ServiceException} 异常时，
@@ -37,7 +42,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(ServiceException.class)
     public ResponseEntity<Result<?>> handleServiceException(ServiceException e){
-        log.error("业务异常: code={}, message={}", e.getCode(), e.getMessage());
+        log.error("Service exception: code={}, message={}", e.getCode(), e.getMessage());
         // 构建响应体
         Result<?> result = Result.fail(e.getResultCode(), e.getMessage());
         // 从异常对象中直接获取正确的 HTTP 状态码
@@ -55,8 +60,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<Result<?>> handleNoResourceFoundException(NoResourceFoundException e){
-        log.warn("资源不存在: {}", e.getMessage());
-        Result<?> result = Result.fail(ResultCode.NOT_FOUND, "资源不存在");
+        log.warn("Resource not found: {}", e.getMessage());
+        Result<?> result = Result.fail(ResultCode.NOT_FOUND, messageHelper.get("error.global.resourceNotFound"));
         return new ResponseEntity<>(result, HttpStatus.NOT_FOUND);
     }
 
@@ -69,8 +74,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler({HttpRequestMethodNotSupportedException.class})
     public ResponseEntity<Result<?>> handleHttpRequestMethodNotSupported (HttpRequestMethodNotSupportedException e){
-        log.warn("不支持的请求方法：{}", e.getMethod());
-        Result<?> result = Result.fail(ResultCode.METHOD_NOT_ALLOWED, "请求方法不支持");
+        log.warn("HTTP method not supported: {}", e.getMethod());
+        Result<?> result = Result.fail(ResultCode.METHOD_NOT_ALLOWED, messageHelper.get("error.global.methodNotAllowed"));
         return new ResponseEntity<>(result, HttpStatus.METHOD_NOT_ALLOWED);
     }
 
@@ -83,8 +88,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler({BadCredentialsException.class, UsernameNotFoundException.class, InternalAuthenticationServiceException.class})
     public ResponseEntity<Result<?>> handleAuthenticationException(Exception e){
-        log.warn("登录失败: {}", e.getMessage());
-        Result<?> result = Result.fail(ResultCode.UNAUTHORIZED, "用户名或密码错误");
+        log.warn("Authentication failed: {}", e.getMessage());
+        Result<?> result = Result.fail(ResultCode.UNAUTHORIZED, messageHelper.get("error.global.invalidCredentials"));
         return new ResponseEntity<>(result, HttpStatus.UNAUTHORIZED);
     }
 
@@ -98,8 +103,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Result<?>> handleHttpMessageNotReadableException(HttpMessageNotReadableException e){
-        log.warn("JSON解析失败: {}", e.getMessage());
-        Result<?> result = Result.fail(ResultCode.BAD_REQUEST, "请求参数格式错误");
+        log.warn("Bad request body: {}", e.getMessage());
+        Result<?> result = Result.fail(ResultCode.BAD_REQUEST, messageHelper.get("error.global.badRequestBody"));
         return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
     }
 
@@ -113,7 +118,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Result<?>> handleValidationException(MethodArgumentNotValidException e){
         BindingResult bindingResult = e.getBindingResult();
-        StringBuilder sb = new StringBuilder("参数校验异常：");
+        StringBuilder sb = new StringBuilder(messageHelper.get("error.global.validationPrefix"));
 
         for(FieldError error : bindingResult.getFieldErrors()){
             sb.append(error.getField())
@@ -123,7 +128,7 @@ public class GlobalExceptionHandler {
         }
 
         String message = sb.toString();
-        log.warn("参数校验异常: {}", message);
+        log.warn("Validation failed: {}", message);
         Result<?> result = Result.fail(ResultCode.BAD_REQUEST, message);
         return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
     }
@@ -137,8 +142,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Result<?>> handleAccessDeniedException(AccessDeniedException e){
-        log.warn("权限不足: {}", e.getMessage());
-        Result<?> result = Result.fail(ResultCode.FORBIDDEN, "无访问权限");
+        log.warn("Access denied: {}", e.getMessage());
+        Result<?> result = Result.fail(ResultCode.FORBIDDEN, messageHelper.get("error.global.accessDenied"));
         return new ResponseEntity<>(result, HttpStatus.FORBIDDEN);
     }
 
@@ -151,8 +156,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Result<?>> handleException(Exception e){
-        log.error("系统异常: ", e); // 打印堆栈信息以便排查
-        Result<?> result = Result.fail(ResultCode.INTERNAL_SERVER_ERROR, "系统繁忙，请稍后重试");
+        log.error("Internal server error: ", e);
+        Result<?> result = Result.fail(ResultCode.INTERNAL_SERVER_ERROR, messageHelper.get("error.global.internalError"));
         return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

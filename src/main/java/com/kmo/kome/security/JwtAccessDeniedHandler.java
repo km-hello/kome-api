@@ -6,11 +6,13 @@ import com.kmo.kome.common.ResultCode;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.context.MessageSource;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Locale;
 
 /**
  * 处理访问被拒绝的情况的处理器实现类。
@@ -22,6 +24,12 @@ import java.io.IOException;
  */
 @Component
 public class JwtAccessDeniedHandler implements AccessDeniedHandler {
+
+    private final MessageSource messageSource;
+
+    public JwtAccessDeniedHandler(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
 
     /**
      * 处理访问被拒绝的情况并向客户端返回 JSON 格式的错误响应。
@@ -38,8 +46,26 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
 
-        Result<Object> result = Result.fail(ResultCode.FORBIDDEN, "无访问权限");
+        // 从 Accept-Language 头手动解析语言环境（Security Filter 链中 LocaleContextHolder 未被填充）
+        Locale locale = resolveLocale(request);
+        // 获取 i18n 访问拒绝消息
+        String message = messageSource.getMessage("error.auth.accessDenied", null, locale);
+
+        Result<Object> result = Result.fail(ResultCode.FORBIDDEN, message);
 
         response.getWriter().write(new ObjectMapper().writeValueAsString(result));
+    }
+
+    /**
+     * 从请求头手动解析语言环境。
+     * Security Filter 链不经过 DispatcherServlet，LocaleContextHolder 未被填充，
+     * 因此需要直接读取 Accept-Language 头判断语言。
+     */
+    private Locale resolveLocale(HttpServletRequest request) {
+        String acceptLanguage = request.getHeader("Accept-Language");
+        if (acceptLanguage != null && acceptLanguage.startsWith("zh")) {
+            return Locale.SIMPLIFIED_CHINESE;
+        }
+        return Locale.ENGLISH;
     }
 }

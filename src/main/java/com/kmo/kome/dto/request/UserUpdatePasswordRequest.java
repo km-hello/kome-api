@@ -11,11 +11,11 @@ import lombok.Data;
  */
 @Data
 public class UserUpdatePasswordRequest {
-    @NotBlank(message = "旧密码不能为空")
+    @NotBlank(message = "{validation.user.oldPassword.notBlank}")
     private String oldPassword;
 
-    @NotBlank(message = "新密码不能为空")
+    @NotBlank(message = "{validation.user.newPassword.notBlank}")
     @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[\\W_]).{8,64}$",
-            message = "新密码必须包含字母、数字和特殊字符，且长度在8-64位之间")
+            message = "{validation.user.newPassword.pattern}")
     private String newPassword;
 }

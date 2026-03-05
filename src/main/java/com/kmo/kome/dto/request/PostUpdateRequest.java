@@ -1,5 +1,7 @@
 package com.kmo.kome.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -15,9 +17,11 @@ import java.util.List;
  */
 @Data
 public class PostUpdateRequest {
-    @Size(min = 1, max = 255, message = "{validation.post.title.sizeUpdate}")
+    @NotBlank(message = "{validation.post.title.notBlank}")
+    @Size(max = 255, message = "{validation.post.title.size}")
     private String title;
 
+    @NotBlank(message = "{validation.post.slug.notBlank}")
     @Size(max = 255, message = "{validation.post.slug.size}")
     @Pattern(regexp = "^[a-z0-9]+(?:-[a-z0-9]+)*$", message = "{validation.post.slug.pattern}")
     private String slug;
@@ -25,15 +29,17 @@ public class PostUpdateRequest {
     @Size(max = 500, message = "{validation.post.summary.size}")
     private String summary;
 
-    @Size(min = 1, message = "{validation.post.content.size}")
+    @NotBlank(message = "{validation.post.content.notBlank}")
     private String content;
 
     @Size(max = 255, message = "{validation.post.coverImage.size}")
     private String coverImage;
 
     // 是否置顶
+    @NotNull(message = "{validation.post.isPinned.notNull}")
     private Boolean isPinned;
 
+    @NotNull(message = "{validation.post.status.notNull}")
     @Range(min = 0, max = 1, message = "{validation.post.status.range}")
     private Integer status;
 

@@ -1,5 +1,7 @@
 package com.kmo.kome.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
@@ -11,9 +13,11 @@ import org.hibernate.validator.constraints.Range;
  */
 @Data
 public class LinkUpdateRequest {
-    @Size(min = 1, max = 100, message = "{validation.link.name.sizeUpdate}")
+    @NotBlank(message = "{validation.link.name.notBlank}")
+    @Size(max = 100, message = "{validation.link.name.size}")
     private String name;
 
+    @NotBlank(message = "{validation.link.url.notBlank}")
     @Size(max = 255, message = "{validation.link.url.size}")
     private String url;
 
@@ -23,6 +27,7 @@ public class LinkUpdateRequest {
     @Size(max = 255, message = "{validation.link.description.size}")
     private String description;
 
+    @NotNull(message = "{validation.link.status.notNull}")
     @Range(min = 0, max = 1, message = "{validation.link.status.range}")
     private Integer status;
 }

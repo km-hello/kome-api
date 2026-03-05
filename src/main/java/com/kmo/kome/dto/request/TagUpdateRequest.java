@@ -12,6 +12,6 @@ import lombok.Data;
 @Data
 public class TagUpdateRequest {
     @NotBlank(message = "{validation.tag.name.notBlank}")
-    @Size(min = 1, max = 50, message = "{validation.tag.name.sizeUpdate}")
+    @Size(max = 50, message = "{validation.tag.name.size}")
     private String name;
 }

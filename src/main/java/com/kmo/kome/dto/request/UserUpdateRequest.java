@@ -3,6 +3,7 @@ package com.kmo.kome.dto.request;
 import com.kmo.kome.dto.SkillItem;
 import com.kmo.kome.dto.SocialLink;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -16,7 +17,8 @@ import java.util.List;
  */
 @Data
 public class UserUpdateRequest {
-    @Size(min = 4, max = 50, message = "{validation.user.username.sizeUpdate}")
+    @NotBlank(message = "{validation.user.username.notBlank}")
+    @Size(max = 50, message = "{validation.user.username.size}")
     @Pattern(regexp = "^[a-zA-Z0-9_-]+$", message = "{validation.user.username.pattern}")
     private String username;
 

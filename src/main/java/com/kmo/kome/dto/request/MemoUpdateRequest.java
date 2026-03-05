@@ -1,5 +1,7 @@
 package com.kmo.kome.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
@@ -11,11 +13,13 @@ import org.hibernate.validator.constraints.Range;
  */
 @Data
 public class MemoUpdateRequest {
-    @Size(min = 1, message = "{validation.memo.content.size}")
+    @NotBlank(message = "{validation.memo.content.notBlank}")
     private String content;
 
+    @NotNull(message = "{validation.memo.isPinned.notNull}")
     private Boolean isPinned;
 
+    @NotNull(message = "{validation.memo.status.notNull}")
     @Range(min = 0, max = 1, message = "{validation.memo.status.range}")
     private Integer status;
 }

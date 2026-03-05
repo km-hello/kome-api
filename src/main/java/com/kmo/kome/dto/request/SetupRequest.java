@@ -32,6 +32,6 @@ public class SetupRequest {
     private String description;
 
     @Email(message = "{validation.user.email.format}")
-    @Size(max = 100)
+    @Size(max = 100, message = "{validation.user.email.size}")
     private String email;
 }

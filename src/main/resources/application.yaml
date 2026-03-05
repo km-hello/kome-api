@@ -23,6 +23,10 @@ spring:
     baseline-on-migrate: true    # 已有数据库时自动设置基线
     validate-on-migrate: true    # 迁移前验证脚本
 
+  # Jackson 序列化配置
+  jackson:
+    default-property-inclusion: always
+
 # 服务端口
 server:
   port: ${SERVER_PORT:8080}

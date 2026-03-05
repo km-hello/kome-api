@@ -150,7 +150,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User updateUser = new User();
         updateUser.setId(user.getId());
 
-        // 将 request 中的非空属性拷贝到 userToUpdate
+        // 将 request 属性拷贝到 updateUser（ALWAYS 策略字段允许 null 更新）
         BeanUtils.copyProperties(request, updateUser);
 
         // 执行更新

@@ -1,9 +1,6 @@
 package com.kmo.kome.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -20,8 +17,10 @@ public class Post {
     private Long id;
     private String title;
     private String slug;
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String summary;
     private String content;
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String coverImage;
     private Integer views;
     private Integer readTime;

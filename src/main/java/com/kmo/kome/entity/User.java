@@ -25,17 +25,21 @@ public class User {
     // 加密后的密码 (不要明文存储)
     private String password;
 
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String nickname;
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String avatar;
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String email;
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String description;
 
     // 社交链接 JSON 数组
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(updateStrategy = FieldStrategy.ALWAYS, typeHandler = JacksonTypeHandler.class)
     private List<SocialLink> socialLinks;
 
     // 技能列表 JSON 数组
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(updateStrategy = FieldStrategy.ALWAYS, typeHandler = JacksonTypeHandler.class)
     private List<SkillItem> skills;
 
     // 是否为站点所有者: 1=是，0=否, 默认 0

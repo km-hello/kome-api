@@ -1,8 +1,6 @@
 package com.kmo.kome.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -19,7 +17,9 @@ public class Link {
     private Long id;
     private String name;
     private String url;
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String avatar;
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String description;
 
     // 状态: 1=公开, 0=隐藏, 默认0

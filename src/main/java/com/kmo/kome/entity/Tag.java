@@ -15,10 +15,16 @@ import java.time.LocalDateTime;
 @Data
 @TableName("tag")
 public class Tag {
+    /** 主键 ID */
     @TableId(type = IdType.AUTO)
     private Long id;
+
+    /** 标签名称 */
     private String name;
 
+    /** 创建时间 */
     private LocalDateTime createTime;
+
+    /** 修改时间 */
     private LocalDateTime updateTime;
 }

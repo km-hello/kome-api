@@ -13,8 +13,12 @@ import java.time.LocalDateTime;
 @Data
 @TableName("post_tag")
 public class PostTag {
+    /** 文章 ID */
     private Long postId;
+
+    /** 标签 ID */
     private Long tagId;
 
+    /** 关联创建时间 */
     private LocalDateTime createTime;
 }

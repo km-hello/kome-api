@@ -2,6 +2,7 @@ package com.kmo.kome.dto.request;
 
 import com.kmo.kome.dto.SkillItem;
 import com.kmo.kome.dto.SocialLink;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -38,10 +39,12 @@ public class UserUpdateRequest {
     /**
      * 社交链接列表
      */
+    @Valid
     private List<SocialLink> socialLinks;
 
     /**
      * 技能列表
      */
+    @Valid
     private List<SkillItem> skills;
 }

@@ -3,7 +3,6 @@ package com.kmo.kome.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.kmo.kome.common.ResultCode;
 import com.kmo.kome.common.exception.ServiceException;
-import com.kmo.kome.dto.SocialLink;
 import com.kmo.kome.dto.request.SetupRequest;
 import com.kmo.kome.dto.response.SiteInfoResponse;
 import com.kmo.kome.entity.Link;
@@ -16,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 /**
  * 站点服务实现类
@@ -60,7 +58,8 @@ public class SiteServiceImpl implements SiteService {
         }
 
         SiteInfoResponse.OwnerInfo ownerInfo = SiteInfoResponse.OwnerInfo.builder()
-                .nickname(user.getNickname())
+                // 如未设置昵称，则返回用户名用于前端显示兜底
+                .nickname(user.getNickname() != null ? user.getNickname() : user.getUsername())
                 .avatar(user.getAvatar())
                 .description(user.getDescription())
                 .createdAt(user.getCreateTime())
@@ -145,8 +144,8 @@ public class SiteServiceImpl implements SiteService {
      * 首次设置管理员账户
      * 仅当系统未初始化时可用，创建第一个管理员账户
      *
-     * @param request 设置请求，包含用户名、密码、昵称、头像、简介、邮箱
-     *                （可选字段由前端填充默认值后发送，确保数据库中始终有值）
+     * @param request 设置请求，包含用户名、密码及可选的昵称、头像、简介、邮箱
+     *                （可选字段未填则为 null）
      * @throws ServiceException 如果系统已初始化
      */
     @Override
@@ -158,22 +157,24 @@ public class SiteServiceImpl implements SiteService {
 
         // 创建管理员账户
         User admin = new User();
+
+        // 账号凭证
         admin.setUsername(request.getUsername());
         admin.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        // 个人资料（可选，未填则为 null）
         admin.setNickname(request.getNickname());
         admin.setAvatar(request.getAvatar());
         admin.setDescription(request.getDescription());
         admin.setEmail(request.getEmail());
+
+        // 角色标记
         admin.setIsOwner(true);
         admin.setIsDeleted(false);
 
-        // 设置默认社交链接
-        admin.setSocialLinks(List.of(
-                new SocialLink("github", "#"),
-                new SocialLink("twitter", "#"),
-                new SocialLink("email", "#"),
-                new SocialLink("website", "#")
-        ));
+        // 列表字段初始化为 null（未设置状态）
+        admin.setSocialLinks(null);
+        admin.setSkills(null);
 
         userService.save(admin);
     }

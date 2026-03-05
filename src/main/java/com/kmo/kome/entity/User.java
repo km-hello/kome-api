@@ -16,34 +16,50 @@ import java.util.List;
 @Data
 @TableName(value = "user", autoResultMap = true)
 public class User {
-    // 主键自增
+    /** 主键 ID */
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    // 登录用户名 (唯一)
+    /** 登录账号 */
     private String username;
-    // 加密后的密码 (不要明文存储)
+
+    /** 加密后的密码 (BCrypt) */
     private String password;
 
+    /** 展示昵称 (可为空) */
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String nickname;
+
+    /** 头像 URL (可为空) */
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String avatar;
+
+    /** 联系邮箱 (可为空) */
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String email;
+
+    /** 个人简介 (侧边栏展示, 可为空) */
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String description;
 
-    // 社交链接 JSON 数组
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    /** 社交链接 JSON 数组 (可为空) */
+    @TableField(updateStrategy = FieldStrategy.ALWAYS, typeHandler = JacksonTypeHandler.class)
     private List<SocialLink> socialLinks;
 
-    // 技能列表 JSON 数组
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    /** 技能列表 JSON 数组 (可为空) */
+    @TableField(updateStrategy = FieldStrategy.ALWAYS, typeHandler = JacksonTypeHandler.class)
     private List<SkillItem> skills;
 
-    // 是否为站点所有者: 1=是，0=否, 默认 0
+    /** 是否为站点所有者: 0=否, 1=是 */
     private Boolean isOwner;
-    // 逻辑删除字段 (MyBatis Plus会自动处理)
+
+    /** 逻辑删除: 0=正常, 1=已删除 */
     @TableLogic
     private Boolean isDeleted;
 
+    /** 创建时间 */
     private LocalDateTime createTime;
+
+    /** 修改时间 */
     private LocalDateTime updateTime;
 }

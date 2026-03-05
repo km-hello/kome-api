@@ -16,17 +16,26 @@ import java.time.LocalDateTime;
 @Data
 @TableName("memo")
 public class Memo {
+    /** 主键 ID */
     @TableId(type = IdType.AUTO)
     private Long id;
+
+    /** 纯文本内容 */
     private String content;
 
-    // 是否置顶: 1=是, 0=否, 默认0
+    /** 是否置顶: 0=否, 1=是 */
     private Boolean isPinned;
-    // 状态: 1=已发布, 0=草稿, 默认0
+
+    /** 状态: 0=草稿, 1=已发布 */
     private Integer status;
+
+    /** 逻辑删除: 0=正常, 1=已删除 */
     @TableLogic
     private Boolean isDeleted;
 
+    /** 创建时间 */
     private LocalDateTime createTime;
+
+    /** 修改时间 */
     private LocalDateTime updateTime;
 }

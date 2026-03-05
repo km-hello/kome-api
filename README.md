@@ -36,6 +36,7 @@ The backend REST API for the Kome blogging platform, built with Spring Boot 3, J
 - **AI Content Assistance** — Generate post summaries and URL slugs via OpenAI-compatible API
 - **Full-Text Search** — MySQL FULLTEXT index on post title and summary
 - **Soft Delete** — Logical deletion for posts, memos, and users
+- **Internationalization (i18n)** — Validation messages in English and Chinese, auto-selected by `Accept-Language` header
 - **First-Run Setup** — One-time initialization endpoint to create the admin account
 - **API Documentation** — Swagger UI available in development mode
 
@@ -117,10 +118,14 @@ src/main/java/com/kmo/kome/
 └── utils/              # JWT utilities
 
 src/main/resources/
-├── application.yaml        # Main configuration
-├── application-dev.yaml    # Development profile
-├── db/migration/           # Flyway SQL scripts
-└── mapper/                 # MyBatis XML mappers
+├── application.yaml                    # Main configuration
+├── application-dev.yaml                # Development profile
+├── messages.properties                 # Business messages (English)
+├── messages_zh_CN.properties           # Business messages (Chinese)
+├── ValidationMessages.properties       # Validation messages (English)
+├── ValidationMessages_zh_CN.properties # Validation messages (Chinese)
+├── db/migration/                       # Flyway SQL scripts
+└── mapper/                             # MyBatis XML mappers
 ```
 
 ## Environment Variables

@@ -201,4 +201,22 @@ public class MemoServiceImpl extends ServiceImpl<MemoMapper, Memo> implements Me
         return baseMapper.selectMemoStats();
     }
 
+    /**
+     * 获取往年今日的 Memo 列表。
+     * 查询历史上同月同日（不含当年）已发布的 Memo，按创建时间倒序排列。
+     *
+     * @return 往年今日的 Memo 列表
+     */
+    @Override
+    public List<MemoResponse> getMemosOnThisDay() {
+        List<Memo> memos = list(new LambdaQueryWrapper<Memo>()
+                .eq(Memo::getStatus, 1)
+                .apply("MONTH(create_time) = MONTH(NOW())")
+                .apply("DAY(create_time) = DAY(NOW())")
+                .apply("YEAR(create_time) < YEAR(NOW())")
+                .orderByDesc(Memo::getCreateTime)
+        );
+        return memos.stream().map(this::toResponse).toList();
+    }
+
 }

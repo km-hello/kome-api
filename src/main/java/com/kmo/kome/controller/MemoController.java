@@ -110,4 +110,15 @@ public class MemoController {
     public Result<MemoStatsResponse> getMemoStats(){
         return Result.success(memoService.getMemoStats());
     }
+
+    /**
+     * 获取往年今日的 Memo 列表。
+     * 查询历史上同月同日发布的 Memo，按创建时间倒序排列。
+     *
+     * @return 包含往年今日 Memo 列表的结果对象。
+     */
+    @GetMapping("/api/memos/on-this-day")
+    public Result<List<MemoResponse>> getMemosOnThisDay(){
+        return Result.success(memoService.getMemosOnThisDay());
+    }
 }

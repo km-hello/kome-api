@@ -80,4 +80,12 @@ public interface MemoService extends IService<Memo> {
      * @return 包含统计数据的响应对象。
      */
     MemoStatsResponse getMemoStats();
+
+    /**
+     * 获取往年今日的 Memo 列表。
+     * 查询历史上同月同日发布的 Memo，按创建时间倒序排列。
+     *
+     * @return 往年今日的 Memo 列表。
+     */
+    List<MemoResponse> getMemosOnThisDay();
 }

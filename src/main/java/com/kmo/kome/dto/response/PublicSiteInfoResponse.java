@@ -19,7 +19,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SiteInfoResponse {
+public class PublicSiteInfoResponse {
 
     private OwnerInfo owner;
     private Stats stats;
@@ -29,7 +29,7 @@ public class SiteInfoResponse {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class OwnerInfo{
+    public static class OwnerInfo {
         private String nickname;
         private String avatar;
         private String description;
@@ -38,23 +38,16 @@ public class SiteInfoResponse {
         private List<SkillItem> skills;        // 技能列表
     }
 
-    // 内部类：站点统计信息
+    // 内部类：站点统计信息（公开 API 仅返回已发布数据）
     @Data
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class Stats{
+    public static class Stats {
         private Long publishedPostCount;    // 已发布的文章数
-        private Long draftPostCount;        // 草稿文章数
-
         private Long usedTagCount;          // 使用中的标签数（有关联已发布文章的）
-        private Long unusedTagCount;        // 未使用的标签数（没有关联已发布文章的）
-
         private Long publishedMemoCount;    // 已发布的动态数
-        private Long draftMemoCount;        // 草稿动态数
-
         private Long publishedLinkCount;    // 已发布的友链数
-        private Long draftLinkCount;        // 草稿友链数
     }
 
 }

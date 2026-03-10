@@ -2,10 +2,8 @@ package com.kmo.kome.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.kmo.kome.common.exception.ServiceException;
-import com.kmo.kome.dto.request.UserLoginRequest;
 import com.kmo.kome.dto.request.UserUpdatePasswordRequest;
 import com.kmo.kome.dto.request.UserUpdateRequest;
-import com.kmo.kome.dto.response.UserLoginResponse;
 import com.kmo.kome.dto.response.UserInfoResponse;
 import com.kmo.kome.entity.User;
 import jakarta.validation.Valid;
@@ -16,15 +14,6 @@ import jakarta.validation.Valid;
  * 继承 IService<User> 获得基础 CRUD 能力，并扩展自定义业务方法。
  */
 public interface UserService extends IService<User> {
-
-    /**
-     * 用户登录。
-     * 通过 Spring Security 进行认证，认证成功后生成 JWT Token 并返回用户信息。
-     *
-     * @param request 登录请求参数，包含用户名和密码。
-     * @return 包含 Token 和用户基本信息的登录响应对象。
-     */
-    UserLoginResponse login(@Valid UserLoginRequest request);
 
     /**
      * 根据用户 ID 获取用户信息。

@@ -4,7 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.kmo.kome.common.ResultCode;
 import com.kmo.kome.common.exception.ServiceException;
 import com.kmo.kome.dto.request.SetupRequest;
-import com.kmo.kome.dto.response.SiteInfoResponse;
+import com.kmo.kome.dto.response.AdminSiteInfoResponse;
+import com.kmo.kome.dto.response.PublicSiteInfoResponse;
 import com.kmo.kome.entity.Link;
 import com.kmo.kome.entity.Memo;
 import com.kmo.kome.entity.Post;
@@ -38,44 +39,20 @@ public class SiteServiceImpl implements SiteService {
     private final MessageHelper messageHelper;
 
     /**
-     * 获取站点管理员的基础信息和统计数据。
-     * 该方法用于聚合站点所有者信息、文章统计、标签统计、动态统计以及友链统计，
-     * 并返回封装好的站点信息响应对象。
+     * 获取后台站点统计数据。
+     * 仅用于管理后台 dashboard，不包含公开 owner 信息。
      * <p>
-     * 如果站点数据缺失（如无法获取管理者信息），则会抛出业务异常。
-     *
-     * @return 包含站点管理员信息和统计数据的响应对象 {@code SiteInfoResponse}。
+     * @return 包含后台统计数据的响应对象 {@code AdminSiteInfoResponse}。
      */
     @Override
-    public SiteInfoResponse getAdminSiteInfo() {
-        // 所有者信息
-        User user = userService.getOne(new LambdaQueryWrapper<User>()
-                .eq(User::getIsOwner, true)
-                .last("LIMIT 1")
-        );
-        if(user == null){
-            throw new ServiceException(ResultCode.INTERNAL_SERVER_ERROR, messageHelper.get("error.site.dataMissing"));
-        }
-
-        SiteInfoResponse.OwnerInfo ownerInfo = SiteInfoResponse.OwnerInfo.builder()
-                // 如未设置昵称，则返回用户名用于前端显示兜底
-                .nickname(user.getNickname() != null ? user.getNickname() : user.getUsername())
-                .avatar(user.getAvatar())
-                .description(user.getDescription())
-                .createdAt(user.getCreateTime())
-                .socialLinks(user.getSocialLinks())
-                .skills(user.getSkills())
-                .build();
-
+    public AdminSiteInfoResponse getAdminSiteInfo() {
         // 统计信息
-        // Post 统计
         long publishedPostCount = postService.count(new LambdaQueryWrapper<Post>().eq(Post::getStatus, 1));
         long draftPostCount = postService.count(new LambdaQueryWrapper<Post>().eq(Post::getStatus, 0));
 
         // Tag 统计
-        long totalTagCount = tagService.count();
-        long usedTagCount = tagService.getPublicTagList().size();
-        long unusedTagCount = totalTagCount - usedTagCount;
+        long usedTagCount = tagService.countUsedTags();
+        long unusedTagCount = tagService.count() - usedTagCount;
 
         // Memo 统计
         long publishedMemoCount = memoService.count(new LambdaQueryWrapper<Memo>().eq(Memo::getStatus, 1));
@@ -85,7 +62,7 @@ public class SiteServiceImpl implements SiteService {
         long publishedLinkCount = linkService.count(new LambdaQueryWrapper<Link>().eq(Link::getStatus, 1));
         long draftLinkCount = linkService.count(new LambdaQueryWrapper<Link>().eq(Link::getStatus, 0));
 
-        SiteInfoResponse.Stats stats = SiteInfoResponse.Stats.builder()
+        return AdminSiteInfoResponse.builder()
                 .publishedPostCount(publishedPostCount)
                 .draftPostCount(draftPostCount)
                 .publishedMemoCount(publishedMemoCount)
@@ -95,34 +72,41 @@ public class SiteServiceImpl implements SiteService {
                 .usedTagCount(usedTagCount)
                 .unusedTagCount(unusedTagCount)
                 .build();
-
-        return SiteInfoResponse.builder()
-                .owner(ownerInfo)
-                .stats(stats)
-                .build();
     }
 
     /**
      * 获取站点的公共信息。
-     * 此方法调用管理员站点信息获取方法，过滤掉草稿相关统计数据，
-     * 并返回包含公开统计数据和所有者信息的响应对象。
+     * 直接查询已发布内容的统计数据，不依赖管理员接口。
      *
-     * @return 包含站点公开信息的响应对象 {@code SiteInfoResponse}。
+     * @return 包含站点公开信息的响应对象 {@code PublicSiteInfoResponse}。
      */
     @Override
-    public SiteInfoResponse getPublicSiteInfo() {
-        SiteInfoResponse adminSiteInfo = getAdminSiteInfo();
-        return SiteInfoResponse.builder()
-                .owner(adminSiteInfo.getOwner())
-                .stats(SiteInfoResponse.Stats.builder()
-                        .publishedPostCount(adminSiteInfo.getStats().getPublishedPostCount())
-                        .draftPostCount(0L)
-                        .publishedMemoCount(adminSiteInfo.getStats().getPublishedMemoCount())
-                        .draftMemoCount(0L)
-                        .publishedLinkCount(adminSiteInfo.getStats().getPublishedLinkCount())
-                        .draftLinkCount(0L)
-                        .usedTagCount(adminSiteInfo.getStats().getUsedTagCount())
-                        .unusedTagCount(0L)
+    public PublicSiteInfoResponse getPublicSiteInfo() {
+        User user = userService.getOne(new LambdaQueryWrapper<User>()
+                .eq(User::getIsOwner, true)
+                .last("LIMIT 1")
+        );
+        if(user == null){
+            throw new ServiceException(ResultCode.INTERNAL_SERVER_ERROR, messageHelper.get("error.site.dataMissing"));
+        }
+
+        PublicSiteInfoResponse.OwnerInfo ownerInfo = PublicSiteInfoResponse.OwnerInfo.builder()
+                // 如未设置昵称，则返回用户名用于前端显示兜底
+                .nickname(user.getNickname() != null ? user.getNickname() : user.getUsername())
+                .avatar(user.getAvatar())
+                .description(user.getDescription())
+                .createdAt(user.getCreateTime())
+                .socialLinks(user.getSocialLinks())
+                .skills(user.getSkills())
+                .build();
+
+        return PublicSiteInfoResponse.builder()
+                .owner(ownerInfo)
+                .stats(PublicSiteInfoResponse.Stats.builder()
+                        .publishedPostCount(postService.count(new LambdaQueryWrapper<Post>().eq(Post::getStatus, 1)))
+                        .publishedMemoCount(memoService.count(new LambdaQueryWrapper<Memo>().eq(Memo::getStatus, 1)))
+                        .publishedLinkCount(linkService.count(new LambdaQueryWrapper<Link>().eq(Link::getStatus, 1)))
+                        .usedTagCount(tagService.countUsedTags())
                         .build())
                 .build();
     }

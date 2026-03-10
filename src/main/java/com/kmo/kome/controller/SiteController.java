@@ -2,7 +2,8 @@ package com.kmo.kome.controller;
 
 import com.kmo.kome.common.Result;
 import com.kmo.kome.dto.request.SetupRequest;
-import com.kmo.kome.dto.response.SiteInfoResponse;
+import com.kmo.kome.dto.response.AdminSiteInfoResponse;
+import com.kmo.kome.dto.response.PublicSiteInfoResponse;
 import com.kmo.kome.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -52,18 +53,18 @@ public class SiteController {
      * @return 包含站点信息的结果对象，包括所有者的昵称、头像、描述以及站点的统计数据。
      */
     @GetMapping("/api/site/info")
-    public Result<SiteInfoResponse> getPublicSiteInfo(){
+    public Result<PublicSiteInfoResponse> getPublicSiteInfo(){
         return Result.success(siteService.getPublicSiteInfo());
     }
 
     /**
-     * 获取管理员权限下的站点信息。
-     * 调用服务层方法，查询站点的详细信息，包括所有者信息和统计数据，并返回结果。
+     * 获取管理员权限下的站点统计信息。
+     * 仅返回后台 dashboard 所需的统计数据，不包含公开 owner 信息。
      *
-     * @return 包含站点信息的结果对象，包括所有者的昵称、头像、描述以及站点的统计数据。
+     * @return 包含后台统计数据的结果对象。
      */
     @GetMapping("/api/admin/site/info")
-    public Result<SiteInfoResponse> getAdminSiteInfo(){
+    public Result<AdminSiteInfoResponse> getAdminSiteInfo(){
         return Result.success(siteService.getAdminSiteInfo());
     }
 

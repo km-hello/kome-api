@@ -9,7 +9,7 @@ import lombok.Data;
  * 用于接收前端提交的登录表单数据
  */
 @Data
-public class UserLoginRequest {
+public class AuthLoginRequest {
     @NotBlank(message = "{validation.user.usernameLogin.notBlank}")
     @Size(max = 50, message = "{validation.user.usernameLogin.size}")
     private String username;

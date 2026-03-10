@@ -4,23 +4,15 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.kmo.kome.common.ResultCode;
 import com.kmo.kome.common.exception.ServiceException;
-import com.kmo.kome.dto.request.UserLoginRequest;
 import com.kmo.kome.dto.request.UserUpdatePasswordRequest;
 import com.kmo.kome.dto.request.UserUpdateRequest;
-import com.kmo.kome.dto.response.UserLoginResponse;
 import com.kmo.kome.dto.response.UserInfoResponse;
 import com.kmo.kome.entity.User;
 import com.kmo.kome.mapper.UserMapper;
-import com.kmo.kome.security.CustomUserDetails;
 import com.kmo.kome.service.UserService;
-import com.kmo.kome.utils.JwtUtils;
 import com.kmo.kome.utils.MessageHelper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -36,46 +28,7 @@ import org.springframework.util.StringUtils;
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
     private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManager authenticationManager;
-    private final JwtUtils jwtUtils;
     private final MessageHelper messageHelper;
-
-    // 过期时间 (毫秒)
-    @Value("${jwt.expiration}")
-    private long expiration;
-
-    /**
-     * 登录逻辑实现
-     *
-     * @param request 登录请求参数
-     * @return 登录响应对象
-     */
-    @Override
-    public UserLoginResponse login(UserLoginRequest request) {
-        // 1. 调用 Spring Security 进行认证
-        // 该方法会调用 UserDetailsServiceImpl 加载用户，并使用 PasswordEncoder 比对密码
-        // 如果认证失败，会抛出 AuthenticationException
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
-        );
-
-        // 2. 【核心修改】直接从 Authentication 对象中获取用户信息，不再查询数据库
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        User user = userDetails.getUser();
-
-        // 3. 【核心修改】使用 userId 生成 JWT Token
-        String token = jwtUtils.generateToken(user.getId());
-
-        // 4. 组装并返回 Response
-        return UserLoginResponse.builder()
-                .token(token)
-                .expiresIn(expiration)
-                .username(user.getUsername())
-                .nickname(user.getNickname())
-                .email(user.getEmail())
-                .avatar(user.getAvatar())
-                .build();
-    }
 
     /**
      * 根据用户ID获取用户信息。
@@ -150,8 +103,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User updateUser = new User();
         updateUser.setId(user.getId());
 
-        // 将 request 属性拷贝到 updateUser（ALWAYS 策略字段允许 null 更新）
-        BeanUtils.copyProperties(request, updateUser);
+        // 显式设置需要更新的字段
+        updateUser.setUsername(request.getUsername());
+        updateUser.setNickname(request.getNickname());
+        updateUser.setAvatar(request.getAvatar());
+        updateUser.setEmail(request.getEmail());
+        updateUser.setDescription(request.getDescription());
+        updateUser.setSocialLinks(request.getSocialLinks());
+        updateUser.setSkills(request.getSkills());
 
         // 执行更新
         // MyBatis Plus 的 updateById 会忽略 userToUpdate 中的 null 字段
@@ -159,10 +118,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         // 返回更新后的用户信息
         User updatedUser = getById(currentUserId);
-        UserInfoResponse response = new UserInfoResponse();
-        BeanUtils.copyProperties(updatedUser, response);
-
-        return response;
+        return UserInfoResponse.builder()
+                .id(updatedUser.getId())
+                .username(updatedUser.getUsername())
+                .nickname(updatedUser.getNickname())
+                .avatar(updatedUser.getAvatar())
+                .email(updatedUser.getEmail())
+                .description(updatedUser.getDescription())
+                .socialLinks(updatedUser.getSocialLinks())
+                .skills(updatedUser.getSkills())
+                .build();
     }
 
     /**
@@ -209,13 +174,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private User checkAndGetUser(Long currentUserId) {
         // 前置检查
         if(currentUserId == null){
-            throw new ServiceException(ResultCode.UNAUTHORIZED, messageHelper.get("error.user.invalidCredentials"));
+            throw new ServiceException(ResultCode.UNAUTHORIZED, messageHelper.get("error.auth.sessionExpired"));
         }
 
         // 检查用户是否存在
         User user = getById(currentUserId);
         if(user == null){
-            throw new ServiceException(ResultCode.UNAUTHORIZED, messageHelper.get("error.user.notFound"));
+            throw new ServiceException(ResultCode.UNAUTHORIZED, messageHelper.get("error.auth.sessionExpired"));
         }
         return user;
     }

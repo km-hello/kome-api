@@ -107,4 +107,23 @@
             post_count DESC, t.id ASC
     </select>
 
+    <!--
+        统计有关联已发布文章的标签数量 (countUsedTags)
+        - 逻辑:
+        - 复用 selectPublicTagList 的 JOIN 逻辑，仅返回 COUNT 而非完整列表。
+        - 避免加载所有标签到内存再取 size()。
+    -->
+    <select id="countUsedTags" resultType="long">
+        SELECT
+            COUNT(DISTINCT t.id)
+        FROM
+            tag t
+        INNER JOIN
+            post_tag pt ON t.id = pt.tag_id
+        INNER JOIN
+            post p ON pt.post_id = p.id
+        WHERE
+            p.status = 1 AND p.is_deleted = 0
+    </select>
+
 </mapper>

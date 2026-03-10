@@ -1,10 +1,8 @@
 package com.kmo.kome.controller;
 
 import com.kmo.kome.common.Result;
-import com.kmo.kome.dto.request.UserLoginRequest;
 import com.kmo.kome.dto.request.UserUpdatePasswordRequest;
 import com.kmo.kome.dto.request.UserUpdateRequest;
-import com.kmo.kome.dto.response.UserLoginResponse;
 import com.kmo.kome.dto.response.UserInfoResponse;
 import com.kmo.kome.service.UserService;
 import jakarta.validation.Valid;
@@ -14,25 +12,13 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * 用户控制器类。
- * 负责处理与用户相关的请求，如登录、注册等操作。
- * 使用了 @RestController 注解标识为控制器，并通过 @RequiredArgsConstructor 自动生成构造函数注入服务对象。
+ * 负责处理后台当前用户的完整资料与密码修改。
  */
 @RestController
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
-
-    /**
-     * 处理用户登录请求。
-     *
-     * @param request 登录请求参数，包含用户名和密码信息。
-     * @return 登录结果，包含 JWT Token、过期时间及用户基本信息。
-     */
-    @PostMapping("/api/user/login")
-    public Result<UserLoginResponse> login(@Valid @RequestBody UserLoginRequest request) {
-        return Result.success(userService.login(request));
-    }
 
     /**
      * 根据用户 ID 获取用户详细信息。

@@ -2,7 +2,8 @@ package com.kmo.kome.service;
 
 import com.kmo.kome.common.exception.ServiceException;
 import com.kmo.kome.dto.request.SetupRequest;
-import com.kmo.kome.dto.response.SiteInfoResponse;
+import com.kmo.kome.dto.response.AdminSiteInfoResponse;
+import com.kmo.kome.dto.response.PublicSiteInfoResponse;
 
 /**
  * 站点业务接口
@@ -18,16 +19,15 @@ public interface SiteService {
      *
      * @return 包含站点公开信息的响应对象。
      */
-    SiteInfoResponse getPublicSiteInfo();
+    PublicSiteInfoResponse getPublicSiteInfo();
 
     /**
-     * 获取站点管理员的完整信息和统计数据。
-     * 聚合站点所有者信息、文章/标签/动态/友链的详细统计。
+     * 获取后台站点统计信息。
+     * 仅返回 dashboard 所需的统计数据。
      *
-     * @return 包含站点管理员信息和完整统计数据的响应对象。
-     * @throws ServiceException 如果站点数据缺失（无法获取管理者信息）。
+     * @return 包含后台统计数据的响应对象。
      */
-    SiteInfoResponse getAdminSiteInfo();
+    AdminSiteInfoResponse getAdminSiteInfo();
 
     /**
      * 检查系统是否已初始化（是否存在管理员账户）。

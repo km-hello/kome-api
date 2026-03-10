@@ -86,4 +86,11 @@ public interface TagService extends IService<Tag> {
      * @return 包含标签信息的列表。
      */
     List<TagResponse> getAdminTagList();
+
+    /**
+     * 统计有关联已发布文章的标签数量。
+     *
+     * @return 使用中的标签数量。
+     */
+    long countUsedTags();
 }

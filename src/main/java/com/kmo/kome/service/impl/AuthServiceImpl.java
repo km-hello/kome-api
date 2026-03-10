@@ -65,7 +65,7 @@ public class AuthServiceImpl implements AuthService {
 
         // 从已认证的 Principal 中提取用户实体, 不再查询数据库
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        User user = userDetails.getUser();
+        User user = userDetails.user();
 
         // 构建登录响应：生成 JWT 令牌 + 计算过期时间 + 附带当前认证信息
         return AuthLoginResponse.builder()

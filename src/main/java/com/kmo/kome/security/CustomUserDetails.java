@@ -1,8 +1,6 @@
 package com.kmo.kome.security;
 
 import com.kmo.kome.entity.User;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -13,11 +11,7 @@ import java.util.List;
  * 自定义用户详情类，用于适配 Spring Security 的 UserDetails 接口。
  * 关联用户实体类 User，并提供用户信息供安全框架使用。
  */
-@Getter
-@RequiredArgsConstructor
-public class CustomUserDetails implements UserDetails {
-
-    private final User user;
+public record CustomUserDetails(User user) implements UserDetails {
 
     /**
      * 获取用户的唯一标识 ID。

@@ -51,4 +51,11 @@ public interface TagMapper extends BaseMapper<Tag> {
      * @return 包含标签信息及其关联文章数量的列表，每个元素表示一个公开标签详情。
      */
     List<TagPostCountResponse> selectPublicTagList();
+
+    /**
+     * 统计有关联已发布文章的标签数量。
+     *
+     * @return 使用中的标签数量。
+     */
+    long countUsedTags();
 }

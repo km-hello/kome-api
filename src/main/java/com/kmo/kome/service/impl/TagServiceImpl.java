@@ -199,4 +199,16 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
     public List<TagWhitPostIdDTO> findTagsByPostIds(List<Long> postIds) {
         return baseMapper.findTagsByPostIds(postIds);
     }
+
+    /**
+     * 统计已被使用的标签数量。
+     * 已使用的标签是指至少关联了一篇已发布文章（status=1 且 is_deleted=0）的标签。
+     * 该方法用于前台公开统计和后台 dashboard 数据展示。
+     *
+     * @return 已使用标签的数量
+     */
+    @Override
+    public long countUsedTags() {
+        return baseMapper.countUsedTags();
+    }
 }

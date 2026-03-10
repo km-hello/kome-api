@@ -174,13 +174,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private User checkAndGetUser(Long currentUserId) {
         // 前置检查
         if(currentUserId == null){
-            throw new ServiceException(ResultCode.UNAUTHORIZED, messageHelper.get("error.user.invalidCredentials"));
+            throw new ServiceException(ResultCode.UNAUTHORIZED, messageHelper.get("error.auth.sessionExpired"));
         }
 
         // 检查用户是否存在
         User user = getById(currentUserId);
         if(user == null){
-            throw new ServiceException(ResultCode.UNAUTHORIZED, messageHelper.get("error.user.notFound"));
+            throw new ServiceException(ResultCode.UNAUTHORIZED, messageHelper.get("error.auth.sessionExpired"));
         }
         return user;
     }

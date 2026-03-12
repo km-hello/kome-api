@@ -2,6 +2,7 @@ package com.kmo.kome.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.kmo.kome.common.exception.ServiceException;
+import com.kmo.kome.dto.request.SetupRequest;
 import com.kmo.kome.dto.request.UserUpdatePasswordRequest;
 import com.kmo.kome.dto.request.UserUpdateRequest;
 import com.kmo.kome.dto.response.UserInfoResponse;
@@ -14,6 +15,14 @@ import jakarta.validation.Valid;
  * 继承 IService<User> 获得基础 CRUD 能力，并扩展自定义业务方法。
  */
 public interface UserService extends IService<User> {
+
+    /**
+     * 创建初始化阶段的 owner 账户。
+     *
+     * @param request 初始化请求
+     * @throws ServiceException 当用户名或邮箱已被占用时抛出
+     */
+    void createInitialOwner(@Valid SetupRequest request);
 
     /**
      * 根据用户 ID 获取用户信息。

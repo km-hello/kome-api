@@ -13,7 +13,6 @@ import com.kmo.kome.entity.User;
 import com.kmo.kome.service.*;
 import com.kmo.kome.utils.MessageHelper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
@@ -35,7 +34,6 @@ public class SiteServiceImpl implements SiteService {
     private final TagService tagService;
     private final MemoService memoService;
     private final LinkService linkService;
-    private final PasswordEncoder passwordEncoder;
     private final MessageHelper messageHelper;
 
     /**
@@ -138,28 +136,7 @@ public class SiteServiceImpl implements SiteService {
         if (isInitialized()) {
             throw new ServiceException(ResultCode.BAD_REQUEST, messageHelper.get("error.site.alreadyInitialized"));
         }
-
-        // 创建管理员账户
-        User admin = new User();
-
-        // 账号凭证
-        admin.setUsername(request.getUsername());
-        admin.setPassword(passwordEncoder.encode(request.getPassword()));
-
-        // 个人资料（可选，未填则为 null）
-        admin.setNickname(request.getNickname());
-        admin.setAvatar(request.getAvatar());
-        admin.setDescription(request.getDescription());
-        admin.setEmail(request.getEmail());
-
-        // 角色标记
-        admin.setIsOwner(true);
-        admin.setIsDeleted(false);
-
-        // 列表字段初始化为 null（未设置状态）
-        admin.setSocialLinks(null);
-        admin.setSkills(null);
-
-        userService.save(admin);
+        // 创建管理员账号
+        userService.createInitialOwner(request);
     }
 }

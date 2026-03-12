@@ -2,6 +2,7 @@ package com.kmo.kome.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
@@ -13,15 +14,20 @@ import org.hibernate.validator.constraints.Range;
  */
 @Data
 public class LinkCreateRequest {
+    /** 仅允许 http/https 协议的链接地址 */
+    private static final String HTTP_URL_PATTERN = "^https?://.+$";
+
     @NotBlank(message = "{validation.link.name.notBlank}")
     @Size(max = 100, message = "{validation.link.name.size}")
     private String name;
 
     @NotBlank(message = "{validation.link.url.notBlank}")
     @Size(max = 255, message = "{validation.link.url.size}")
+    @Pattern(regexp = HTTP_URL_PATTERN, message = "{validation.link.url.pattern}")
     private String url;
 
     @Size(max = 255, message = "{validation.link.avatar.size}")
+    @Pattern(regexp = HTTP_URL_PATTERN, message = "{validation.link.avatar.pattern}")
     private String avatar;
 
     @Size(max = 255, message = "{validation.link.description.size}")

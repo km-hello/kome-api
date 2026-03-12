@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.kmo.kome.common.ResultCode;
 import com.kmo.kome.common.exception.ServiceException;
+import com.kmo.kome.dto.request.SetupRequest;
 import com.kmo.kome.dto.request.UserUpdatePasswordRequest;
 import com.kmo.kome.dto.request.UserUpdateRequest;
 import com.kmo.kome.dto.response.UserInfoResponse;
@@ -29,6 +30,40 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     private final PasswordEncoder passwordEncoder;
     private final MessageHelper messageHelper;
+
+    /**
+     * 创建初始化阶段的 owner 账户，并集中处理唯一性校验与默认字段填充。
+     *
+     * @param request 初始化请求
+     * @throws ServiceException 当用户名或邮箱已被占用时抛出
+     */
+    @Override
+    public void createInitialOwner(SetupRequest request) {
+        checkUsernameAvailable(request.getUsername(), null);
+        checkEmailAvailable(request.getEmail(), null);
+
+        User owner = new User();
+
+        // 账号凭证
+        owner.setUsername(request.getUsername());
+        owner.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        // 个人资料（可选，未填则为 null）
+        owner.setNickname(request.getNickname());
+        owner.setAvatar(request.getAvatar());
+        owner.setEmail(request.getEmail());
+        owner.setDescription(request.getDescription());
+
+        // 列表字段初始化为 null（未设置状态）
+        owner.setSocialLinks(null);
+        owner.setSkills(null);
+
+        // 角色标记
+        owner.setIsOwner(true);
+        owner.setIsDeleted(false);
+
+        save(owner);
+    }
 
     /**
      * 根据用户ID获取用户信息。
@@ -75,29 +110,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 前置检查
         User user = checkAndGetUser(currentUserId);
 
-        // 检查用户名是否被占用
-        String newUsername = request.getUsername();
-        if(StringUtils.hasText(newUsername) && !newUsername.equals(user.getUsername())){
-            boolean isUsernameTaken = lambdaQuery()
-                    .eq(User::getUsername, newUsername)
-                    .ne(User::getId, user.getId())
-                    .exists();
-            if(isUsernameTaken){
-                throw new ServiceException(ResultCode.BAD_REQUEST, messageHelper.get("error.user.usernameTaken"));
-            }
-        }
-
-        // 检查邮箱是否被占用
-        String newEmail = request.getEmail();
-        if(StringUtils.hasText(newEmail) && !newEmail.equals(user.getEmail())){
-            boolean isEmailTaken  = lambdaQuery()
-                    .eq(User::getEmail, newEmail)
-                    .ne(User::getId, user.getId())
-                    .exists();
-            if(isEmailTaken){
-                throw new ServiceException(ResultCode.BAD_REQUEST, messageHelper.get("error.user.emailTaken"));
-            }
-        }
+        checkUsernameAvailable(request.getUsername(), user.getId());
+        checkEmailAvailable(request.getEmail(), user.getId());
 
         // 创建一个新的实体用于更新，只包含ID和需要更新的字段
         User updateUser = new User();
@@ -183,5 +197,47 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new ServiceException(ResultCode.UNAUTHORIZED, messageHelper.get("error.auth.sessionExpired"));
         }
         return user;
+    }
+
+    /**
+     * 校验用户名是否可用。
+     *
+     * @param username 用户名
+     * @param excludeUserId 需要排除的用户 ID，可为空
+     */
+    private void checkUsernameAvailable(String username, Long excludeUserId) {
+        if (!StringUtils.hasText(username)) {
+            return;
+        }
+
+        var query = lambdaQuery().eq(User::getUsername, username);
+        if (excludeUserId != null) {
+            query = query.ne(User::getId, excludeUserId);
+        }
+
+        if (query.exists()) {
+            throw new ServiceException(ResultCode.BAD_REQUEST, messageHelper.get("error.user.usernameTaken"));
+        }
+    }
+
+    /**
+     * 校验邮箱是否可用。
+     *
+     * @param email 邮箱
+     * @param excludeUserId 需要排除的用户 ID，可为空
+     */
+    private void checkEmailAvailable(String email, Long excludeUserId) {
+        if (!StringUtils.hasText(email)) {
+            return;
+        }
+
+        var query = lambdaQuery().eq(User::getEmail, email);
+        if (excludeUserId != null) {
+            query = query.ne(User::getId, excludeUserId);
+        }
+
+        if (query.exists()) {
+            throw new ServiceException(ResultCode.BAD_REQUEST, messageHelper.get("error.user.emailTaken"));
+        }
     }
 }

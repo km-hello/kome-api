@@ -19,7 +19,7 @@ import java.util.List;
 @Data
 public class UserUpdateRequest {
     @NotBlank(message = "{validation.user.username.notBlank}")
-    @Size(max = 50, message = "{validation.user.username.size}")
+    @Size(min = 4, max = 50, message = "{validation.user.username.size}")
     @Pattern(regexp = "^[a-zA-Z0-9_-]+$", message = "{validation.user.username.pattern}")
     private String username;
 

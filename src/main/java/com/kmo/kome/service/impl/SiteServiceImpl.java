@@ -14,6 +14,8 @@ import com.kmo.kome.service.*;
 import com.kmo.kome.utils.MessageHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 
 /**
@@ -131,6 +133,7 @@ public class SiteServiceImpl implements SiteService {
      * @throws ServiceException 如果系统已初始化
      */
     @Override
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.SERIALIZABLE)
     public void setupAdmin(SetupRequest request) {
         // 检查是否已初始化
         if (isInitialized()) {

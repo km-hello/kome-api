@@ -27,6 +27,16 @@ spring:
   jackson:
     default-property-inclusion: always
 
+  # Spring AI 配置（OpenAI 兼容 API）
+  ai:
+    openai:
+      api-key: ${AI_API_KEY:}
+      base-url: ${AI_BASE_URL:https://api.openai.com}
+      chat:
+        options:
+          # 默认模型，可在不同环境通过 AI_MODEL 覆盖
+          model: ${AI_MODEL:gpt-4o-mini}
+
 # 服务端口
 server:
   port: ${SERVER_PORT:8080}
@@ -56,10 +66,3 @@ management:
   endpoint:
     health:
       show-details: never
-
-# AI 配置（后端代理调用 OpenAI 兼容 API）
-ai:
-  api-key: ${AI_API_KEY:}
-  base-url: ${AI_BASE_URL:https://api.openai.com}
-  model: ${AI_MODEL:gpt-4o-mini}
-  timeout: ${AI_TIMEOUT:30}

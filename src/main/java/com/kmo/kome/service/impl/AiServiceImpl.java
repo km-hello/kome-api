@@ -1,58 +1,33 @@
 package com.kmo.kome.service.impl;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kmo.kome.common.ResultCode;
 import com.kmo.kome.common.exception.ServiceException;
-import com.kmo.kome.config.AiConfig;
 import com.kmo.kome.dto.request.AiSlugRequest;
 import com.kmo.kome.dto.request.AiSummaryRequest;
 import com.kmo.kome.dto.response.AiResultResponse;
 import com.kmo.kome.service.AiService;
 import com.kmo.kome.utils.MessageHelper;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-
-import java.time.Duration;
-import java.util.List;
-import java.util.Map;
 
 /**
  * AI 服务实现类。
  * <p>
- * 通过 WebClient 调用 OpenAI 兼容的 Chat Completions API，
- * 提供文章摘要生成和 URL Slug 生成功能。
+ * 基于 Spring AI 调用 OpenAI 兼容模型，提供文章摘要生成和 URL Slug 生成功能。
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class AiServiceImpl implements AiService {
 
-    private final WebClient aiWebClient;
-    private final AiConfig aiConfig;
+    private final ChatClient chatClient;
     private final MessageHelper messageHelper;
 
-    // ==================== OpenAI 响应结构 ====================
-    @Data
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    private static class ChatCompletionResponse {
-        private List<Choice> choices;
-    }
-
-    @Data
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    private static class Choice {
-        private Message message;
-    }
-
-    @Data
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    private static class Message {
-        private String role;
-        private String content;
+    public AiServiceImpl(ChatClient.Builder chatClientBuilder, MessageHelper messageHelper) {
+        // 使用 Spring AI 自动装配的 Builder，复用统一的模型与连接配置
+        this.chatClient = chatClientBuilder.build();
+        this.messageHelper = messageHelper;
     }
 
     /**
@@ -94,60 +69,32 @@ public class AiServiceImpl implements AiService {
     }
 
     /**
-     * 调用 OpenAI 兼容的 Chat Completions API。
-     * 构造请求体，发送 POST 请求并解析响应中的消息内容。
+     * 调用 Spring AI ChatClient 生成文本内容。
      *
      * @param systemPrompt 系统提示词，用于指导模型的输出格式和风格。
      * @param userMessage  用户消息，即需要模型处理的输入文本。
      * @param temperature  温度参数，控制输出的随机性（值越低越确定）。
      * @return 模型生成的文本内容。
-     * @throws ServiceException 当请求失败、响应为空或解析异常时抛出。
+     * @throws ServiceException 当请求失败或返回结果为空时抛出。
      */
     private String callChatApi(String systemPrompt, String userMessage, double temperature) {
-        // 1. 构造 Chat Completions 请求体
-        //    - model: 从配置文件读取的模型名称
-        //    - temperature: 控制输出随机性，值越低结果越确定
-        //    - messages: 包含 system（指导输出格式）和 user（待处理文本）两条消息
-        Map<String, Object> requestBody = Map.of(
-                "model", aiConfig.getModel(),
-                "temperature", temperature,
-                "messages", List.of(
-                        Map.of("role", "system", "content", systemPrompt),
-                        Map.of("role", "user", "content", userMessage)
-                )
-        );
-
         try {
-            // 2. 发送 POST 请求至 /v1/chat/completions 端点
-            //    - 每次请求动态携带 Authorization header，避免 API Key 硬编码在 WebClient 中
-            //    - 使用 bodyToMono + block() 同步阻塞获取结果
-            //    - timeout 从配置文件读取，超时后抛出 TimeoutException
-            ChatCompletionResponse response = aiWebClient.post()
-                    .uri("/v1/chat/completions")
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + aiConfig.getApiKey())
-                    .bodyValue(requestBody)
-                    .retrieve()
-                    .bodyToMono(ChatCompletionResponse.class)
-                    .timeout(Duration.ofSeconds(aiConfig.getTimeout()))
-                    .block();
+            // 按请求覆盖 temperature，其他参数（模型、base-url、api-key）走配置文件
+            String content = chatClient
+                    .prompt()
+                    .system(systemPrompt)
+                    .user(userMessage)
+                    .options(OpenAiChatOptions.builder().temperature(temperature).build())
+                    .call()
+                    .content();
 
-            // 3. 校验响应结构：确保 choices 列表非空
-            if (response == null || response.getChoices() == null || response.getChoices().isEmpty()) {
-                throw new ServiceException(ResultCode.INTERNAL_SERVER_ERROR, messageHelper.get("error.ai.emptyResult"));
-            }
-
-            // 4. 提取第一个 choice 中的消息内容并校验非空
-            String content = response.getChoices().getFirst().getMessage().getContent();
             if (content == null || content.isBlank()) {
                 throw new ServiceException(ResultCode.INTERNAL_SERVER_ERROR, messageHelper.get("error.ai.emptyResult"));
             }
-
             return content.trim();
         } catch (ServiceException e) {
-            // 5a. 业务异常直接抛出，交给 GlobalExceptionHandler 统一处理
             throw e;
         } catch (Exception e) {
-            // 5b. 其他异常（超时、连接拒绝、JSON 解析失败等）统一转换为用户友好的业务异常
             log.error("AI service call failed", e);
             throw new ServiceException(ResultCode.INTERNAL_SERVER_ERROR, messageHelper.get("error.ai.unavailable"));
         }

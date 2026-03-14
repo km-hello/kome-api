@@ -24,7 +24,7 @@ The backend REST API for the Kome blogging platform, built with Spring Boot 3, J
 | Migration  | Flyway                         |
 | Security   | Spring Security + JWT (jjwt)   |
 | API Docs   | SpringDoc OpenAPI (Swagger UI) |
-| AI         | OpenAI-compatible Chat API     |
+| AI         | Spring AI + OpenAI-compatible Chat API |
 | Monitoring | Spring Actuator                |
 
 ## Features
@@ -33,7 +33,7 @@ The backend REST API for the Kome blogging platform, built with Spring Boot 3, J
   friend links)
 - **JWT Authentication** — Stateless Bearer token auth with BCrypt password hashing
 - **Database Migration** — Flyway-managed schema with versioned SQL scripts
-- **AI Content Assistance** — Generate post summaries and URL slugs via OpenAI-compatible API
+- **AI Content Assistance** — Generate post summaries and URL slugs via Spring AI
 - **Full-Text Search** — MySQL FULLTEXT index on post title and summary
 - **Soft Delete** — Logical deletion for posts, memos, and users
 - **Internationalization (i18n)** — Validation messages in English and Chinese, auto-selected by `Accept-Language` header
@@ -144,4 +144,3 @@ src/main/resources/
 | `AI_API_KEY`             | OpenAI-compatible API key              | —                        |
 | `AI_BASE_URL`            | AI API base URL                        | `https://api.openai.com` |
 | `AI_MODEL`               | AI model name                          | `gpt-4o-mini`            |
-| `AI_TIMEOUT`             | AI request timeout (seconds)           | `30`                     |

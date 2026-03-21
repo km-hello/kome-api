@@ -40,6 +40,20 @@ public class ServiceException extends RuntimeException{
     }
 
     /**
+     * 使用指定的结果代码、自定义错误消息和原始异常创建服务异常。
+     * 该构造方法用于在保留底层异常堆栈的同时，对外暴露统一的业务异常信息。
+     *
+     * @param resultCode 结果代码枚举，包含错误码和默认错误消息。
+     * @param message 自定义的错误消息，可用于覆盖结果代码中的默认错误消息。
+     * @param cause 原始异常对象，用于保留调用链路和堆栈信息。
+     */
+    public ServiceException(ResultCode resultCode, String message, Throwable cause) {
+        super(message, cause);
+        this.code = resultCode.getCode();
+        this.resultCode = resultCode;
+    }
+
+    /**
      * 获取与当前服务异常相关联的 HTTP 状态码。
      * 该方法从异常的结果代码中提取对应的 HTTP 状态码，用于统一封装和响应业务操作的 HTTP 状态。
      *

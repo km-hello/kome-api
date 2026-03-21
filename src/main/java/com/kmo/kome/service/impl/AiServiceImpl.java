@@ -6,6 +6,7 @@ import com.kmo.kome.dto.request.AiSlugRequest;
 import com.kmo.kome.dto.request.AiSummaryRequest;
 import com.kmo.kome.dto.response.AiResultResponse;
 import com.kmo.kome.service.AiService;
+import com.kmo.kome.service.prompt.AiPromptProvider;
 import com.kmo.kome.utils.MessageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
@@ -21,12 +22,22 @@ import org.springframework.stereotype.Service;
 @Service
 public class AiServiceImpl implements AiService {
 
+    private static final int SUMMARY_MAX_INPUT_LENGTH = 50000;
+    private static final double SUMMARY_TEMPERATURE = 0.4;
+    private static final double SLUG_TEMPERATURE = 0.2;
+
     private final ChatClient chatClient;
+    private final AiPromptProvider aiPromptProvider;
     private final MessageHelper messageHelper;
 
-    public AiServiceImpl(ChatClient.Builder chatClientBuilder, MessageHelper messageHelper) {
+    public AiServiceImpl(
+            ChatClient.Builder chatClientBuilder,
+            AiPromptProvider aiPromptProvider,
+            MessageHelper messageHelper
+    ) {
         // 使用 Spring AI 自动装配的 Builder，复用统一的模型与连接配置
         this.chatClient = chatClientBuilder.build();
+        this.aiPromptProvider = aiPromptProvider;
         this.messageHelper = messageHelper;
     }
 
@@ -42,9 +53,14 @@ public class AiServiceImpl implements AiService {
     public AiResultResponse generateSummary(AiSummaryRequest request) {
         String content = request.getContent();
         // 截断内容至 50000 字符，避免超出模型上下文限制
-        String truncated = content.length() > 50000 ? content.substring(0, 50000) : content;
-        String systemPrompt = "为一篇技术博客文章生成中文摘要。风格参考少数派、阮一峰博客的文章描述：简洁清晰，有信息量。20-100字，只客观描述文章内容本身，不要出现'本文''读者''用户''帮助'等词，不要用疑问句，不要描述文章的目的或受众。只返回摘要文本。";
-        String summary = callChatApi(systemPrompt, truncated, 0.4);
+        String truncated = content.length() > SUMMARY_MAX_INPUT_LENGTH
+                ? content.substring(0, SUMMARY_MAX_INPUT_LENGTH)
+                : content;
+        String summary = callChatApi(
+                aiPromptProvider.getSummarySystemPrompt(),
+                truncated,
+                SUMMARY_TEMPERATURE
+        );
         return new AiResultResponse(summary);
     }
 
@@ -58,8 +74,11 @@ public class AiServiceImpl implements AiService {
      */
     @Override
     public AiResultResponse generateSlug(AiSlugRequest request) {
-        String systemPrompt = "将标题转换为英文 URL slug。规则：小写+连字符，提炼标题核心含义（副标题、修饰语可省略），技术名词保留原文（如 react、docker），尽量简短但保证意义完整，不超过80个字符。只返回 slug。";
-        String raw = callChatApi(systemPrompt, request.getTitle(), 0.2);
+        String raw = callChatApi(
+                aiPromptProvider.getSlugSystemPrompt(),
+                request.getTitle(),
+                SLUG_TEMPERATURE
+        );
         // 后处理确保 slug 格式合规
         String slug = raw.toLowerCase()
                 .replaceAll("[^a-z0-9\\-]", "")
